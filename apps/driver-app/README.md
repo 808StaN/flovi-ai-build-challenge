@@ -23,4 +23,4 @@ Deploy the generated `build/web` directory as a static Vercel site.
 
 ## Current Scope
 
-This phase includes Supabase initialization, Google OAuth login/logout, and a mobile-first UI shell. Gig browsing and booking arrive in the next phase.
+This app includes Supabase initialization, Google OAuth login/logout, available gig browsing, booking confirmation through the atomic Supabase RPC, booked gig tracking, and realtime/refetch sync.
