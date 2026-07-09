@@ -54,3 +54,31 @@ The plan needed small corrections before implementation: static-first Flutter We
 ### Why The Next Iteration Was Needed
 
 The next iteration starts Phase 1 and creates the repository foundation with the corrected backend and deployment assumptions.
+
+### Prompt Number
+
+2
+
+### Goal
+
+Scaffold the dispatcher web app only, without implementing request CRUD.
+
+### Prompt Summary
+
+Asked the AI to proceed with Phase 2 by creating the Vue 3, Vite, Tailwind CSS dispatcher app, adding Supabase Google OAuth shell behavior, running relevant checks, and committing the result.
+
+### AI Output Summary
+
+The AI generated the dispatcher app scaffold, Supabase client setup, Flovi-inspired auth/dashboard shell, and environment example while intentionally leaving relocation request CRUD for a later phase.
+
+### What Changed
+
+Created the dispatcher Vue 3 app scaffold with Vite, Tailwind CSS, Supabase client setup, `.env.example`, Google OAuth sign-in/sign-out shell, and a Flovi-inspired dashboard landing state.
+
+### What Broke Or Needed Correction
+
+Review caught several Tailwind opacity utilities using non-default values like `/8` and `/68`. They were corrected to bracketed arbitrary opacity syntax, then `npm run build` passed again.
+
+### Why The Next Iteration Was Needed
+
+The next iteration is needed to add the actual relocation request workflow: create, list, edit, status badges, and Supabase realtime refresh.
