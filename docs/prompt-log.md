@@ -166,3 +166,31 @@ Initial Flutter verification failed because no SDK was installed or on PATH. Bas
 ### Why The Next Iteration Was Needed
 
 The next iteration can focus on final integration testing with real Supabase credentials, deployment prep, Vercel URLs, and presentation docs.
+
+### Prompt Number
+
+6
+
+### Goal
+
+Prepare integration and deployment documentation without adding product features.
+
+### Prompt Summary
+
+Asked the AI to verify both apps use the same Supabase schema and RPC, update Vercel deployment instructions, document required Supabase env vars and OAuth redirect URLs, add a smoke-test checklist, ensure build output and the temporary Flutter SDK are not committed, update prompt/reflection docs, run available checks, and commit.
+
+### AI Output Summary
+
+The AI verified both apps use `public.relocation_requests`, the driver books through `book_relocation_request`, and both apps subscribe/refetch around the shared table. It expanded root and Supabase docs with deployment, env var, redirect, smoke-test, and cleanup guidance.
+
+### What Changed
+
+Updated `README.md`, `supabase/README.md`, `docs/reflection.md`, and this prompt log with integration/deployment preparation details.
+
+### What Broke Or Needed Correction
+
+No product correction was needed. `npm run build`, `flutter pub get`, `flutter analyze`, and `flutter build web --release` passed. Build output stayed ignored, and the temporary Flutter SDK remained outside the repository.
+
+### Why The Next Iteration Was Needed
+
+The next iteration should use real Supabase credentials and deployed Vercel URLs to execute the smoke-test checklist end to end.
