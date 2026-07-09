@@ -1,10 +1,26 @@
 <script setup>
-import { computed, onMounted, ref } from 'vue';
+import { computed, onMounted, onUnmounted, reactive, ref } from 'vue';
 import { isSupabaseConfigured, supabase } from './lib/supabase';
+
+const emptyForm = () => ({
+  origin: '',
+  destination: '',
+  move_date: '',
+  notes: '',
+});
 
 const session = ref(null);
 const isAuthLoading = ref(true);
+const isRequestsLoading = ref(false);
+const isSaving = ref(false);
 const authError = ref('');
+const requestsError = ref('');
+const requests = ref([]);
+const editingId = ref(null);
+const form = reactive(emptyForm());
+
+let realtimeChannel = null;
+let authSubscription = null;
 
 const userName = computed(() => {
   const user = session.value?.user;
@@ -19,6 +35,20 @@ const userInitials = computed(() =>
     .map((part) => part[0]?.toUpperCase())
     .join('') || 'F',
 );
+
+const sortedRequests = computed(() =>
+  [...requests.value].sort((first, second) =>
+    new Date(second.created_at).getTime() - new Date(first.created_at).getTime(),
+  ),
+);
+
+const requestStats = computed(() => ({
+  available: requests.value.filter((request) => request.status === 'available').length,
+  booked: requests.value.filter((request) => request.status === 'booked').length,
+  completed: requests.value.filter((request) => request.status === 'completed').length,
+}));
+
+const isEditing = computed(() => Boolean(editingId.value));
 
 const signInWithGoogle = async () => {
   authError.value = '';
@@ -54,6 +84,145 @@ const signOut = async () => {
   }
 };
 
+const resetForm = () => {
+  Object.assign(form, emptyForm());
+  editingId.value = null;
+};
+
+const fetchRequests = async () => {
+  if (!supabase || !session.value) {
+    requests.value = [];
+    return;
+  }
+
+  isRequestsLoading.value = true;
+  requestsError.value = '';
+
+  const { data, error } = await supabase
+    .from('relocation_requests')
+    .select('id, origin, destination, move_date, notes, status, dispatcher_id, driver_id, booked_at, created_at, updated_at')
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    requestsError.value = error.message;
+  } else {
+    requests.value = data || [];
+  }
+
+  isRequestsLoading.value = false;
+};
+
+const startRealtime = () => {
+  if (!supabase || realtimeChannel) {
+    return;
+  }
+
+  realtimeChannel = supabase
+    .channel('dispatcher-relocation-requests')
+    .on(
+      'postgres_changes',
+      { event: '*', schema: 'public', table: 'relocation_requests' },
+      () => {
+        fetchRequests();
+      },
+    )
+    .subscribe();
+};
+
+const stopRealtime = () => {
+  if (!supabase || !realtimeChannel) {
+    return;
+  }
+
+  supabase.removeChannel(realtimeChannel);
+  realtimeChannel = null;
+};
+
+const submitRequest = async () => {
+  requestsError.value = '';
+
+  if (!supabase || !session.value) {
+    requestsError.value = 'Sign in with Google before managing relocation requests.';
+    return;
+  }
+
+  isSaving.value = true;
+
+  const payload = {
+    origin: form.origin.trim(),
+    destination: form.destination.trim(),
+    move_date: form.move_date,
+    notes: form.notes.trim() || null,
+  };
+
+  const result = isEditing.value
+    ? await supabase
+        .from('relocation_requests')
+        .update(payload)
+        .eq('id', editingId.value)
+        .eq('dispatcher_id', session.value.user.id)
+    : await supabase.from('relocation_requests').insert({
+        ...payload,
+        dispatcher_id: session.value.user.id,
+      });
+
+  if (result.error) {
+    requestsError.value = result.error.message;
+  } else {
+    resetForm();
+    await fetchRequests();
+  }
+
+  isSaving.value = false;
+};
+
+const startEdit = (request) => {
+  editingId.value = request.id;
+  form.origin = request.origin;
+  form.destination = request.destination;
+  form.move_date = request.move_date;
+  form.notes = request.notes || '';
+};
+
+const canEdit = (request) => request.dispatcher_id === session.value?.user?.id;
+
+const formatDate = (value) => {
+  if (!value) {
+    return 'No date';
+  }
+
+  return new Intl.DateTimeFormat('en', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+  }).format(new Date(`${value}T12:00:00`));
+};
+
+const formatDateTime = (value) => {
+  if (!value) {
+    return 'Not booked yet';
+  }
+
+  return new Intl.DateTimeFormat('en', {
+    month: 'short',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  }).format(new Date(value));
+};
+
+const statusLabel = (status) => ({
+  available: 'Available',
+  booked: 'Booked',
+  completed: 'Completed',
+}[status] || 'Unknown');
+
+const statusBadgeClass = (status) => ({
+  available: 'border-flovi-mint/40 bg-flovi-mint/[0.15] text-flovi-mint',
+  booked: 'border-flovi-lemon/50 bg-flovi-lemon/25 text-flovi-lemon',
+  completed: 'border-flovi-lilac/50 bg-flovi-lilac/25 text-flovi-lilac',
+}[status] || 'border-white/20 bg-white/10 text-white/70');
+
 onMounted(async () => {
   if (!isSupabaseConfigured || !supabase) {
     isAuthLoading.value = false;
@@ -69,9 +238,31 @@ onMounted(async () => {
   session.value = data.session;
   isAuthLoading.value = false;
 
-  supabase.auth.onAuthStateChange((_event, nextSession) => {
+  if (data.session) {
+    await fetchRequests();
+    startRealtime();
+  }
+
+  const { data: authListener } = supabase.auth.onAuthStateChange((_event, nextSession) => {
     session.value = nextSession;
+    authError.value = '';
+
+    if (nextSession) {
+      fetchRequests();
+      startRealtime();
+    } else {
+      requests.value = [];
+      resetForm();
+      stopRealtime();
+    }
   });
+
+  authSubscription = authListener.subscription;
+});
+
+onUnmounted(() => {
+  stopRealtime();
+  authSubscription?.unsubscribe();
 });
 </script>
 
@@ -109,7 +300,7 @@ onMounted(async () => {
         </div>
       </nav>
 
-      <div class="grid flex-1 items-center gap-10 py-12 lg:grid-cols-[1fr_0.82fr] lg:py-16">
+      <div v-if="!session" class="grid flex-1 items-center gap-10 py-12 lg:grid-cols-[1fr_0.82fr] lg:py-16">
         <div class="max-w-3xl">
           <div class="mb-6 inline-flex rounded-full border border-flovi-mint/30 bg-flovi-mint/10 px-4 py-2 text-sm font-bold text-flovi-mint">
             Relocation ops, ready for dispatch
@@ -120,12 +311,11 @@ onMounted(async () => {
           </h1>
 
           <p class="mt-6 max-w-2xl text-lg leading-8 text-white/[0.68]">
-            A Flovi-inspired dashboard shell for dispatchers to authenticate and prepare relocation operations. Request creation, editing, and live lists arrive in the next phase.
+            Sign in to create relocation requests, track availability, and watch booking status update from the shared Supabase backend.
           </p>
 
           <div class="mt-8 flex flex-col gap-3 sm:flex-row">
             <button
-              v-if="!session"
               class="rounded-full bg-flovi-mint px-6 py-4 text-base font-black text-flovi-ink shadow-glow transition hover:-translate-y-0.5 hover:bg-[#7cffc6] disabled:cursor-not-allowed disabled:opacity-60"
               type="button"
               :disabled="isAuthLoading"
@@ -149,48 +339,169 @@ onMounted(async () => {
 
         <aside class="rounded-[2rem] border border-white/10 bg-white/[0.09] p-4 shadow-card backdrop-blur-2xl sm:p-5">
           <div class="rounded-[1.5rem] bg-white p-5 text-flovi-night sm:p-6">
-            <div class="flex items-center justify-between gap-4">
-              <div>
-                <p class="text-sm font-black uppercase tracking-[0.24em] text-flovi-violet">Today</p>
-                <h2 class="mt-2 text-3xl font-black">Ops Pulse</h2>
-              </div>
-              <span class="rounded-full bg-flovi-mint px-4 py-2 text-sm font-black text-flovi-ink">
-                Shell
-              </span>
-            </div>
-
-            <div class="mt-6 grid gap-3 sm:grid-cols-3 lg:grid-cols-1 xl:grid-cols-3">
-              <div class="rounded-3xl bg-flovi-sky/[0.45] p-4">
-                <p class="text-sm font-bold text-flovi-night/60">Available</p>
-                <p class="mt-3 text-4xl font-black">--</p>
-              </div>
-              <div class="rounded-3xl bg-flovi-lemon/70 p-4">
-                <p class="text-sm font-bold text-flovi-night/60">Booked</p>
-                <p class="mt-3 text-4xl font-black">--</p>
-              </div>
-              <div class="rounded-3xl bg-flovi-lilac/70 p-4">
-                <p class="text-sm font-bold text-flovi-night/60">Completed</p>
-                <p class="mt-3 text-4xl font-black">--</p>
-              </div>
-            </div>
-
-            <div class="mt-5 rounded-3xl border border-dashed border-flovi-violet/30 bg-flovi-violet/5 p-5">
-              <p class="text-sm font-black uppercase tracking-[0.22em] text-flovi-violet">Next phase</p>
-              <h3 class="mt-3 text-2xl font-black">Relocation request workflow</h3>
-              <p class="mt-2 text-sm leading-6 text-flovi-night/[0.62]">
-                This scaffold intentionally stops before CRUD. The next milestone adds create, list, edit, and realtime status updates against Supabase.
-              </p>
-            </div>
-
-            <div class="mt-5 flex items-center justify-between rounded-3xl bg-flovi-night px-5 py-4 text-white">
-              <div>
-                <p class="text-sm font-bold text-white/50">Auth status</p>
-                <p class="font-black">{{ session ? 'Signed in' : isAuthLoading ? 'Checking session' : 'Ready for Google OAuth' }}</p>
-              </div>
-              <div class="h-3 w-3 rounded-full" :class="session ? 'bg-flovi-mint' : 'bg-flovi-lemon'" />
+            <p class="text-sm font-black uppercase tracking-[0.24em] text-flovi-violet">Workflow</p>
+            <h2 class="mt-2 text-3xl font-black">Create. Sync. Book.</h2>
+            <div class="mt-6 space-y-3">
+              <div class="rounded-3xl bg-flovi-sky/[0.45] p-4 font-bold">1. Dispatcher creates a relocation request.</div>
+              <div class="rounded-3xl bg-flovi-lemon/70 p-4 font-bold">2. Driver sees it as available.</div>
+              <div class="rounded-3xl bg-flovi-lilac/70 p-4 font-bold">3. Booking updates the dispatcher board.</div>
             </div>
           </div>
         </aside>
+      </div>
+
+      <div v-else class="py-10 lg:py-12">
+        <header class="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+          <div>
+            <div class="mb-4 inline-flex rounded-full border border-flovi-mint/30 bg-flovi-mint/10 px-4 py-2 text-sm font-bold text-flovi-mint">
+              Live dispatcher board
+            </div>
+            <h1 class="max-w-4xl text-4xl font-black leading-none tracking-tight sm:text-5xl lg:text-6xl">
+              Relocation requests moving through one shared pipeline.
+            </h1>
+            <p class="mt-4 max-w-2xl text-base leading-7 text-white/[0.68]">
+              Create and edit relocation jobs here. Driver bookings appear automatically through Supabase realtime updates.
+            </p>
+          </div>
+          <button class="rounded-full border border-white/[0.15] px-5 py-3 text-sm font-black text-white transition hover:border-white/30 hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-60" type="button" :disabled="isRequestsLoading" @click="fetchRequests">
+            {{ isRequestsLoading ? 'Refreshing...' : 'Refresh board' }}
+          </button>
+        </header>
+
+        <section class="mt-8 grid gap-4 md:grid-cols-3">
+          <div class="rounded-[1.7rem] bg-flovi-sky/[0.18] p-5 ring-1 ring-flovi-sky/20">
+            <p class="text-sm font-bold text-flovi-sky">Available</p>
+            <p class="mt-3 text-5xl font-black">{{ requestStats.available }}</p>
+          </div>
+          <div class="rounded-[1.7rem] bg-flovi-lemon/[0.16] p-5 ring-1 ring-flovi-lemon/20">
+            <p class="text-sm font-bold text-flovi-lemon">Booked</p>
+            <p class="mt-3 text-5xl font-black">{{ requestStats.booked }}</p>
+          </div>
+          <div class="rounded-[1.7rem] bg-flovi-lilac/[0.16] p-5 ring-1 ring-flovi-lilac/20">
+            <p class="text-sm font-bold text-flovi-lilac">Completed</p>
+            <p class="mt-3 text-5xl font-black">{{ requestStats.completed }}</p>
+          </div>
+        </section>
+
+        <div class="mt-8 grid gap-6 xl:grid-cols-[0.9fr_1.35fr]">
+          <section class="rounded-[2rem] border border-white/10 bg-white/[0.09] p-4 shadow-card backdrop-blur-2xl sm:p-5">
+            <form class="rounded-[1.5rem] bg-white p-5 text-flovi-night sm:p-6" @submit.prevent="submitRequest">
+              <p class="text-sm font-black uppercase tracking-[0.24em] text-flovi-violet">
+                {{ isEditing ? 'Edit request' : 'New relocation' }}
+              </p>
+              <h2 class="mt-2 text-3xl font-black">
+                {{ isEditing ? 'Update job details' : 'Create a request' }}
+              </h2>
+
+              <div class="mt-6 grid gap-4">
+                <label class="block">
+                  <span class="text-sm font-black text-flovi-night/70">Origin</span>
+                  <input v-model="form.origin" class="mt-2 w-full rounded-2xl border border-flovi-night/10 bg-flovi-night/[0.04] px-4 py-3 font-semibold outline-none transition focus:border-flovi-violet focus:ring-4 focus:ring-flovi-violet/10" required placeholder="Austin, TX" type="text" />
+                </label>
+
+                <label class="block">
+                  <span class="text-sm font-black text-flovi-night/70">Destination</span>
+                  <input v-model="form.destination" class="mt-2 w-full rounded-2xl border border-flovi-night/10 bg-flovi-night/[0.04] px-4 py-3 font-semibold outline-none transition focus:border-flovi-violet focus:ring-4 focus:ring-flovi-violet/10" required placeholder="Denver, CO" type="text" />
+                </label>
+
+                <label class="block">
+                  <span class="text-sm font-black text-flovi-night/70">Move date</span>
+                  <input v-model="form.move_date" class="mt-2 w-full rounded-2xl border border-flovi-night/10 bg-flovi-night/[0.04] px-4 py-3 font-semibold outline-none transition focus:border-flovi-violet focus:ring-4 focus:ring-flovi-violet/10" required type="date" />
+                </label>
+
+                <label class="block">
+                  <span class="text-sm font-black text-flovi-night/70">Notes</span>
+                  <textarea v-model="form.notes" class="mt-2 min-h-28 w-full resize-none rounded-2xl border border-flovi-night/10 bg-flovi-night/[0.04] px-4 py-3 font-semibold outline-none transition focus:border-flovi-violet focus:ring-4 focus:ring-flovi-violet/10" placeholder="Elevator access, preferred pickup window, special handling..." />
+                </label>
+              </div>
+
+              <p v-if="requestsError" class="mt-4 rounded-2xl border border-red-300/40 bg-red-50 px-4 py-3 text-sm font-bold text-red-700">
+                {{ requestsError }}
+              </p>
+
+              <div class="mt-6 flex flex-col gap-3 sm:flex-row">
+                <button class="rounded-full bg-flovi-mint px-6 py-4 text-base font-black text-flovi-ink shadow-glow transition hover:-translate-y-0.5 hover:bg-[#7cffc6] disabled:cursor-not-allowed disabled:opacity-60" type="submit" :disabled="isSaving">
+                  {{ isSaving ? 'Saving...' : isEditing ? 'Save changes' : 'Create request' }}
+                </button>
+                <button v-if="isEditing" class="rounded-full border border-flovi-night/10 px-6 py-4 text-base font-black text-flovi-night transition hover:bg-flovi-night/5" type="button" @click="resetForm">
+                  Cancel edit
+                </button>
+              </div>
+            </form>
+          </section>
+
+          <section class="rounded-[2rem] border border-white/10 bg-white/[0.09] p-4 shadow-card backdrop-blur-2xl sm:p-5">
+            <div class="rounded-[1.5rem] bg-white p-5 text-flovi-night sm:p-6">
+              <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                <div>
+                  <p class="text-sm font-black uppercase tracking-[0.24em] text-flovi-violet">All requests</p>
+                  <h2 class="mt-2 text-3xl font-black">Operations queue</h2>
+                </div>
+                <span class="rounded-full bg-flovi-night px-4 py-2 text-sm font-black text-white">
+                  {{ sortedRequests.length }} total
+                </span>
+              </div>
+
+              <div v-if="isRequestsLoading && !sortedRequests.length" class="mt-6 rounded-3xl bg-flovi-night/[0.04] p-6 text-center font-bold text-flovi-night/60">
+                Loading relocation requests...
+              </div>
+
+              <div v-else-if="!sortedRequests.length" class="mt-6 rounded-3xl border border-dashed border-flovi-violet/30 bg-flovi-violet/5 p-6 text-center">
+                <p class="text-lg font-black">No relocation requests yet.</p>
+                <p class="mt-2 text-sm font-semibold text-flovi-night/60">Create the first request to make it available for drivers.</p>
+              </div>
+
+              <div v-else class="mt-6 space-y-4">
+                <article v-for="request in sortedRequests" :key="request.id" class="rounded-3xl border border-flovi-night/10 bg-flovi-night/[0.035] p-4 transition hover:-translate-y-0.5 hover:bg-flovi-night/[0.055] sm:p-5">
+                  <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                    <div>
+                      <div class="flex flex-wrap items-center gap-2">
+                        <span class="rounded-full border px-3 py-1 text-xs font-black uppercase tracking-[0.16em]" :class="statusBadgeClass(request.status)">
+                          {{ statusLabel(request.status) }}
+                        </span>
+                        <span v-if="canEdit(request)" class="rounded-full bg-flovi-mint/20 px-3 py-1 text-xs font-black text-flovi-night">
+                          Your request
+                        </span>
+                      </div>
+                      <h3 class="mt-4 text-2xl font-black leading-tight">
+                        {{ request.origin }} <span class="text-flovi-violet">-></span> {{ request.destination }}
+                      </h3>
+                      <p class="mt-2 text-sm font-bold text-flovi-night/60">
+                        Move date: {{ formatDate(request.move_date) }}
+                      </p>
+                    </div>
+
+                    <button v-if="canEdit(request)" class="rounded-full bg-flovi-night px-4 py-2 text-sm font-black text-white transition hover:bg-flovi-violet" type="button" @click="startEdit(request)">
+                      Edit
+                    </button>
+                    <span v-else class="rounded-full bg-flovi-night/5 px-4 py-2 text-sm font-black text-flovi-night/50">
+                      Read only
+                    </span>
+                  </div>
+
+                  <p class="mt-4 rounded-2xl bg-white px-4 py-3 text-sm font-semibold leading-6 text-flovi-night/70">
+                    {{ request.notes || 'No dispatcher notes added.' }}
+                  </p>
+
+                  <dl class="mt-4 grid gap-3 text-sm sm:grid-cols-3">
+                    <div class="rounded-2xl bg-white px-4 py-3">
+                      <dt class="font-black text-flovi-night/[0.45]">Created</dt>
+                      <dd class="mt-1 font-bold">{{ formatDateTime(request.created_at) }}</dd>
+                    </div>
+                    <div class="rounded-2xl bg-white px-4 py-3">
+                      <dt class="font-black text-flovi-night/[0.45]">Booked</dt>
+                      <dd class="mt-1 font-bold">{{ formatDateTime(request.booked_at) }}</dd>
+                    </div>
+                    <div class="rounded-2xl bg-white px-4 py-3">
+                      <dt class="font-black text-flovi-night/[0.45]">Driver</dt>
+                      <dd class="mt-1 truncate font-bold">{{ request.driver_id || 'Unassigned' }}</dd>
+                    </div>
+                  </dl>
+                </article>
+              </div>
+            </div>
+          </section>
+        </div>
       </div>
     </section>
   </main>

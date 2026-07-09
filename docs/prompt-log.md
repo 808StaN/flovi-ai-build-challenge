@@ -82,3 +82,31 @@ Review caught several Tailwind opacity utilities using non-default values like `
 ### Why The Next Iteration Was Needed
 
 The next iteration is needed to add the actual relocation request workflow: create, list, edit, status badges, and Supabase realtime refresh.
+
+### Prompt Number
+
+3
+
+### Goal
+
+Implement the dispatcher relocation workflow.
+
+### Prompt Summary
+
+Asked the AI to add the create request form, list all requests, status badges, edit/update existing requests, Supabase realtime/refetch after changes, checks, and a commit.
+
+### AI Output Summary
+
+The AI implemented authenticated dispatcher CRUD for request creation and detail updates, a polished operations queue, status summary cards, clear status badges, manual refresh, and realtime refetch on `relocation_requests` changes.
+
+### What Changed
+
+`apps/dispatcher-web/src/App.vue` now contains the full dispatcher workflow against Supabase while preserving the Flovi-inspired design system.
+
+### What Broke Or Needed Correction
+
+Review caught a couple of Tailwind opacity utilities that needed bracketed arbitrary syntax. After correction, `npm run build` passed.
+
+### Why The Next Iteration Was Needed
+
+The next iteration can move to the driver Flutter app scaffold and later connect driver booking to the same Supabase data.
