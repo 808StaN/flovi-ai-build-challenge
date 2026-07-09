@@ -110,3 +110,31 @@ Review caught a couple of Tailwind opacity utilities that needed bracketed arbit
 ### Why The Next Iteration Was Needed
 
 The next iteration can move to the driver Flutter app scaffold and later connect driver booking to the same Supabase data.
+
+### Prompt Number
+
+4
+
+### Goal
+
+Scaffold the Driver Flutter app with Supabase OAuth shell only.
+
+### Prompt Summary
+
+Asked the AI to create the Flutter app in `apps/driver-app`, initialize Supabase through `SUPABASE_URL` and `SUPABASE_ANON_KEY` dart defines, add Google OAuth login/logout, create a mobile-first Flovi-inspired UI shell, avoid booking, run Flutter checks, and commit.
+
+### AI Output Summary
+
+The AI created a Flutter driver app scaffold manually because Flutter was not installed in the environment. The app includes Supabase initialization through dart defines, Google OAuth login/logout shell behavior, and a mobile-first Flovi-inspired UI.
+
+### What Changed
+
+Added `apps/driver-app` with `pubspec.yaml`, lint options, web entry files, README setup notes, `lib/main.dart`, and a widget test for the auth shell.
+
+### What Broke Or Needed Correction
+
+`flutter`, `dart`, and `fvm` were not available on PATH. `flutter pub get` and `flutter analyze` could not run in this environment and failed with `CommandNotFoundException`.
+
+### Why The Next Iteration Was Needed
+
+The next iteration needs Flutter installed locally to run dependency resolution and analysis before implementing driver gig browsing and booking.

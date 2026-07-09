@@ -1,0 +1,14 @@
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+build/
+
+# Editor files
+.idea/
+.vscode/
+*.iml
+
+# Environment files
+.env
+.env.local

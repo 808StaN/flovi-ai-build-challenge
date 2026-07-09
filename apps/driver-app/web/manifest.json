@@ -1,0 +1,9 @@
+{
+  "name": "Flovi Driver",
+  "short_name": "Flovi Driver",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#100B2F",
+  "theme_color": "#34F5A6",
+  "description": "Flovi relocation driver app."
+}
