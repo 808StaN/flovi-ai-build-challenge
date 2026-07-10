@@ -5,6 +5,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 const supabaseUrl = String.fromEnvironment('SUPABASE_URL');
 const supabaseAnonKey = String.fromEnvironment('SUPABASE_ANON_KEY');
+const driverOAuthRedirectUrl = 'https://flovi-driver-app.vercel.app/';
 const isSupabaseConfigured = supabaseUrl != '' && supabaseAnonKey != '';
 
 Future<void> main() async {
@@ -134,7 +135,7 @@ class _DriverHomePageState extends State<DriverHomePage> {
     try {
       await client.auth.signInWithOAuth(
         OAuthProvider.google,
-        redirectTo: Uri.base.origin,
+        redirectTo: driverOAuthRedirectUrl,
       );
     } on AuthException catch (error) {
       setState(() {

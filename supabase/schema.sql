@@ -72,6 +72,8 @@ to authenticated
 using (dispatcher_id = auth.uid())
 with check (dispatcher_id = auth.uid());
 
+drop function if exists public.book_relocation_request(uuid);
+
 create or replace function public.book_relocation_request(request_id uuid)
 returns table (
   success boolean,
@@ -96,8 +98,8 @@ begin
   if auth.uid() is null then
     return query
     select
-      false,
-      'Authentication is required to book a relocation request.',
+      false::boolean,
+      'Authentication is required to book a relocation request.'::text,
       null::uuid,
       null::text,
       null::text,
@@ -119,7 +121,7 @@ begin
       status = 'booked',
       driver_id = auth.uid(),
       booked_at = now()
-    where rr.id = request_id
+    where rr.id = $1
       and rr.status = 'available'
       and rr.driver_id is null
     returning
@@ -136,8 +138,8 @@ begin
       rr.updated_at
   )
   select
-    true,
-    'Relocation request booked successfully.',
+    true::boolean,
+    'Relocation request booked successfully.'::text,
     booked.id,
     booked.origin,
     booked.destination,
@@ -154,13 +156,13 @@ begin
   if not found then
     return query
     select
-      false,
+      false::boolean,
       case
-        when exists (select 1 from public.relocation_requests rr where rr.id = request_id) then
+        when exists (select 1 from public.relocation_requests rr where rr.id = $1) then
           'This relocation request is no longer available.'
         else
           'Relocation request was not found.'
-      end,
+      end::text,
       null::uuid,
       null::text,
       null::text,
