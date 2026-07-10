@@ -1108,7 +1108,7 @@ class _PreviewCard extends StatelessWidget {
             children: [
               Expanded(
                 child: Text(
-                  'Live gig preview',
+                  'Example gig preview',
                   style: TextStyle(
                     color: FloviColors.ink,
                     fontSize: 22,
@@ -1133,7 +1133,7 @@ class _PreviewCard extends StatelessWidget {
           ),
           SizedBox(height: 16),
           Text(
-            'Real dispatcher requests appear after sign-in.',
+            'Sign in to see real dispatcher requests.',
             style: TextStyle(
               color: Color(0x99100B2F),
               height: 1.45,
