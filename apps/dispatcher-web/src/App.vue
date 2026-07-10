@@ -422,9 +422,13 @@ onUnmounted(() => {
       </section>
     </template>
 
-    <section v-else class="bg-[#F7F6FF] px-5 py-10 sm:px-8 lg:px-10">
-      <div class="mx-auto max-w-7xl">
-        <header class="rounded-[2rem] bg-flovi-night p-6 text-white shadow-card sm:p-8 lg:p-10">
+    <section v-else class="relative overflow-hidden bg-white px-5 py-10 sm:px-8 lg:px-10">
+      <div class="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,#ffffff_0%,#f7f6ff_45%,#ffffff_100%)]" />
+      <div class="pointer-events-none absolute -right-28 top-28 h-80 w-80 rounded-full bg-flovi-lilac/[0.22] blur-3xl" />
+      <div class="pointer-events-none absolute -left-24 bottom-10 h-72 w-72 rounded-full bg-flovi-sky/[0.18] blur-3xl" />
+
+      <div class="relative mx-auto max-w-7xl">
+        <header class="rounded-[2rem] bg-[linear-gradient(135deg,#100b2f,#17113f)] p-6 text-white shadow-card sm:p-8 lg:p-10">
           <div class="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
             <div>
               <div class="mb-4 inline-flex rounded-full bg-flovi-mint px-4 py-2 text-sm font-black text-flovi-night">
@@ -444,23 +448,23 @@ onUnmounted(() => {
         </header>
 
         <section class="mt-6 grid gap-4 md:grid-cols-3">
-          <div class="rounded-[1.7rem] bg-flovi-mint p-5 text-flovi-night shadow-card">
+          <div class="rounded-[1.7rem] border border-flovi-night/10 bg-flovi-mint p-5 text-flovi-night shadow-card">
             <p class="text-sm font-black">Available</p>
             <p class="mt-3 text-5xl font-black">{{ requestStats.available }}</p>
           </div>
-          <div class="rounded-[1.7rem] bg-flovi-sky p-5 text-flovi-night shadow-card">
+          <div class="rounded-[1.7rem] border border-flovi-night/10 bg-flovi-sky p-5 text-flovi-night shadow-card">
             <p class="text-sm font-black">Booked</p>
             <p class="mt-3 text-5xl font-black">{{ requestStats.booked }}</p>
           </div>
-          <div class="rounded-[1.7rem] bg-flovi-lilac p-5 text-flovi-night shadow-card">
+          <div class="rounded-[1.7rem] border border-flovi-night/10 bg-flovi-lilac p-5 text-flovi-night shadow-card">
             <p class="text-sm font-black">Completed</p>
             <p class="mt-3 text-5xl font-black">{{ requestStats.completed }}</p>
           </div>
         </section>
 
         <div class="mt-6 grid gap-6 xl:grid-cols-[0.9fr_1.35fr]">
-          <section class="rounded-[2rem] bg-white p-4 shadow-card sm:p-5">
-            <form class="rounded-[1.5rem] border border-flovi-night/10 bg-white p-5 text-flovi-night sm:p-6" @submit.prevent="submitRequest">
+          <section class="rounded-[2rem] border border-flovi-night/10 bg-white/95 p-4 shadow-card backdrop-blur sm:p-5">
+            <form class="rounded-[1.5rem] border border-flovi-night/10 bg-[linear-gradient(180deg,#ffffff,#fbfaff)] p-5 text-flovi-night sm:p-6" @submit.prevent="submitRequest">
               <p class="text-sm font-black uppercase tracking-[0.24em] text-flovi-violet">
                 {{ isEditing ? 'Edit request' : 'New relocation' }}
               </p>
@@ -471,22 +475,22 @@ onUnmounted(() => {
               <div class="mt-6 grid gap-4">
                 <label class="block">
                   <span class="text-sm font-black text-flovi-night/70">Origin</span>
-                  <input v-model="form.origin" class="mt-2 w-full rounded-2xl border border-flovi-night/10 bg-[#F7F6FF] px-4 py-3 font-semibold outline-none transition focus:border-flovi-violet focus:ring-4 focus:ring-flovi-violet/10" required placeholder="Austin, TX" type="text" />
+                  <input v-model="form.origin" class="mt-2 w-full rounded-2xl border border-flovi-night/10 bg-white px-4 py-3 font-semibold shadow-[inset_0_1px_0_rgba(255,255,255,0.9)] outline-none transition placeholder:text-flovi-night/35 focus:border-flovi-violet focus:bg-[#F7F6FF] focus:ring-4 focus:ring-flovi-violet/10" required placeholder="Austin, TX" type="text" />
                 </label>
 
                 <label class="block">
                   <span class="text-sm font-black text-flovi-night/70">Destination</span>
-                  <input v-model="form.destination" class="mt-2 w-full rounded-2xl border border-flovi-night/10 bg-[#F7F6FF] px-4 py-3 font-semibold outline-none transition focus:border-flovi-violet focus:ring-4 focus:ring-flovi-violet/10" required placeholder="Denver, CO" type="text" />
+                  <input v-model="form.destination" class="mt-2 w-full rounded-2xl border border-flovi-night/10 bg-white px-4 py-3 font-semibold shadow-[inset_0_1px_0_rgba(255,255,255,0.9)] outline-none transition placeholder:text-flovi-night/35 focus:border-flovi-violet focus:bg-[#F7F6FF] focus:ring-4 focus:ring-flovi-violet/10" required placeholder="Denver, CO" type="text" />
                 </label>
 
                 <label class="block">
                   <span class="text-sm font-black text-flovi-night/70">Move date</span>
-                  <input v-model="form.move_date" class="mt-2 w-full rounded-2xl border border-flovi-night/10 bg-[#F7F6FF] px-4 py-3 font-semibold outline-none transition focus:border-flovi-violet focus:ring-4 focus:ring-flovi-violet/10" required type="date" />
+                  <input v-model="form.move_date" class="mt-2 w-full rounded-2xl border border-flovi-night/10 bg-white px-4 py-3 font-semibold shadow-[inset_0_1px_0_rgba(255,255,255,0.9)] outline-none transition focus:border-flovi-violet focus:bg-[#F7F6FF] focus:ring-4 focus:ring-flovi-violet/10" required type="date" />
                 </label>
 
                 <label class="block">
                   <span class="text-sm font-black text-flovi-night/70">Notes</span>
-                  <textarea v-model="form.notes" class="mt-2 min-h-28 w-full resize-none rounded-2xl border border-flovi-night/10 bg-[#F7F6FF] px-4 py-3 font-semibold outline-none transition focus:border-flovi-violet focus:ring-4 focus:ring-flovi-violet/10" placeholder="Elevator access, preferred pickup window, special handling..." />
+                  <textarea v-model="form.notes" class="mt-2 min-h-28 w-full resize-none rounded-2xl border border-flovi-night/10 bg-white px-4 py-3 font-semibold shadow-[inset_0_1px_0_rgba(255,255,255,0.9)] outline-none transition placeholder:text-flovi-night/35 focus:border-flovi-violet focus:bg-[#F7F6FF] focus:ring-4 focus:ring-flovi-violet/10" placeholder="Elevator access, preferred pickup window, special handling..." />
                 </label>
               </div>
 
@@ -505,8 +509,8 @@ onUnmounted(() => {
             </form>
           </section>
 
-          <section class="rounded-[2rem] bg-white p-4 shadow-card sm:p-5">
-            <div class="rounded-[1.5rem] border border-flovi-night/10 bg-white p-5 text-flovi-night sm:p-6">
+          <section class="rounded-[2rem] border border-flovi-night/10 bg-white/95 p-4 shadow-card backdrop-blur sm:p-5">
+            <div class="rounded-[1.5rem] border border-flovi-night/10 bg-[linear-gradient(180deg,#ffffff,#fbfaff)] p-5 text-flovi-night sm:p-6">
               <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                 <div>
                   <p class="text-sm font-black uppercase tracking-[0.24em] text-flovi-violet">All requests</p>
@@ -517,17 +521,17 @@ onUnmounted(() => {
                 </span>
               </div>
 
-              <div v-if="isRequestsLoading && !sortedRequests.length" class="mt-6 rounded-3xl bg-[#F7F6FF] p-6 text-center font-bold text-flovi-night/60">
+              <div v-if="isRequestsLoading && !sortedRequests.length" class="mt-6 rounded-3xl border border-flovi-night/10 bg-white p-6 text-center font-bold text-flovi-night/60 shadow-[inset_0_1px_0_rgba(255,255,255,0.9)]">
                 Loading relocation requests...
               </div>
 
-              <div v-else-if="!sortedRequests.length" class="mt-6 rounded-3xl border border-dashed border-flovi-violet/30 bg-flovi-violet/5 p-6 text-center">
+              <div v-else-if="!sortedRequests.length" class="mt-6 rounded-3xl border border-dashed border-flovi-violet/30 bg-white p-6 text-center shadow-[inset_0_1px_0_rgba(255,255,255,0.9)]">
                 <p class="text-lg font-black">No relocation requests yet.</p>
                 <p class="mt-2 text-sm font-semibold text-flovi-night/60">Create the first request to make it available for drivers.</p>
               </div>
 
               <div v-else class="mt-6 space-y-4">
-                <article v-for="request in sortedRequests" :key="request.id" class="rounded-3xl border border-flovi-night/10 bg-[#F7F6FF] p-4 transition hover:-translate-y-0.5 hover:bg-white sm:p-5">
+                <article v-for="request in sortedRequests" :key="request.id" class="rounded-3xl border border-flovi-night/10 bg-[linear-gradient(135deg,#f7f6ff,#ffffff)] p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.9)] transition hover:-translate-y-0.5 hover:border-flovi-violet/30 hover:shadow-card sm:p-5">
                   <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                     <div>
                       <div class="flex flex-wrap items-center gap-2">
@@ -538,8 +542,8 @@ onUnmounted(() => {
                           Your request
                         </span>
                       </div>
-                      <h3 class="mt-4 text-2xl font-black leading-tight">
-                        {{ request.origin }} <span class="text-flovi-violet">-></span> {{ request.destination }}
+                      <h3 class="mt-4 text-2xl font-black leading-tight tracking-tight">
+                        {{ request.origin }} <span class="text-flovi-violet">&rarr;</span> {{ request.destination }}
                       </h3>
                       <p class="mt-2 text-sm font-bold text-flovi-night/60">
                         Move date: {{ formatDate(request.move_date) }}
@@ -554,20 +558,20 @@ onUnmounted(() => {
                     </span>
                   </div>
 
-                  <p class="mt-4 rounded-2xl bg-white px-4 py-3 text-sm font-semibold leading-6 text-flovi-night/70">
+                  <p class="mt-4 rounded-2xl border border-flovi-night/5 bg-white px-4 py-3 text-sm font-semibold leading-6 text-flovi-night/70">
                     {{ request.notes || 'No dispatcher notes added.' }}
                   </p>
 
                   <dl class="mt-4 grid gap-3 text-sm sm:grid-cols-3">
-                    <div class="rounded-2xl bg-white px-4 py-3">
+                    <div class="rounded-2xl border border-flovi-night/5 bg-white px-4 py-3">
                       <dt class="font-black text-flovi-night/[0.45]">Created</dt>
                       <dd class="mt-1 font-bold">{{ formatDateTime(request.created_at) }}</dd>
                     </div>
-                    <div class="rounded-2xl bg-white px-4 py-3">
+                    <div class="rounded-2xl border border-flovi-night/5 bg-white px-4 py-3">
                       <dt class="font-black text-flovi-night/[0.45]">Booked</dt>
                       <dd class="mt-1 font-bold">{{ formatDateTime(request.booked_at, 'Not booked yet') }}</dd>
                     </div>
-                    <div class="rounded-2xl bg-white px-4 py-3">
+                    <div class="rounded-2xl border border-flovi-night/5 bg-white px-4 py-3">
                       <dt class="font-black text-flovi-night/[0.45]">Driver</dt>
                       <dd class="mt-1 truncate font-bold">{{ request.driver_id || 'Unassigned' }}</dd>
                     </div>
