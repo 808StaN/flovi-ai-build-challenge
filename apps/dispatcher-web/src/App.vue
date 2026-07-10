@@ -382,16 +382,16 @@ onUnmounted(() => {
       <section class="bg-flovi-night px-5 py-12 text-white sm:px-8 lg:px-10">
         <div class="mx-auto grid max-w-5xl gap-6 text-center md:grid-cols-3">
           <div>
-            <p class="text-5xl font-black">3</p>
-            <p class="mt-2 text-sm font-bold text-white/70">Core request states</p>
+            <p class="text-5xl font-black">Open</p>
+            <p class="mt-2 text-sm font-bold text-white/70">Jobs ready to assign</p>
           </div>
           <div>
-            <p class="text-5xl font-black">1</p>
-            <p class="mt-2 text-sm font-bold text-white/70">Shared Supabase table</p>
+            <p class="text-5xl font-black">Booked</p>
+            <p class="mt-2 text-sm font-bold text-white/70">Drivers confirmed</p>
           </div>
           <div>
-            <p class="text-5xl font-black">0</p>
-            <p class="mt-2 text-sm font-bold text-white/70">Manual booking calls</p>
+            <p class="text-5xl font-black">Synced</p>
+            <p class="mt-2 text-sm font-bold text-white/70">Updates across both apps</p>
           </div>
         </div>
       </section>
