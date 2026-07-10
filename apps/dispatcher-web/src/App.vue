@@ -242,7 +242,7 @@ const statusLabel = (status) => ({
 
 const statusBadgeClass = (status) => ({
   available: 'border-flovi-mint/40 bg-flovi-mint/[0.15] text-flovi-mint',
-  booked: 'border-flovi-lemon/50 bg-flovi-lemon/25 text-flovi-lemon',
+  booked: 'border-flovi-sky/70 bg-flovi-sky/[0.22] text-flovi-sky',
   completed: 'border-flovi-lilac/50 bg-flovi-lilac/25 text-flovi-lilac',
 }[status] || 'border-white/20 bg-white/10 text-white/70');
 
@@ -312,7 +312,6 @@ onUnmounted(() => {
         <div v-if="session" class="flex items-center gap-3">
           <div class="hidden text-right sm:block">
             <p class="text-sm font-semibold">{{ userName }}</p>
-            <p class="text-xs text-white/[0.55]">Google session active</p>
           </div>
           <div class="flex h-10 w-10 items-center justify-center rounded-full bg-white text-sm font-black text-flovi-night">
             {{ userInitials }}
@@ -346,9 +345,6 @@ onUnmounted(() => {
             >
               Continue with Google
             </button>
-            <a class="rounded-full border border-white/[0.15] px-6 py-4 text-center text-base font-bold text-white transition hover:border-white/30 hover:bg-white/10" href="https://supabase.com/docs/guides/auth/social-login/auth-google" target="_blank" rel="noreferrer">
-              OAuth setup notes
-            </a>
           </div>
 
           <p v-if="authError" class="mt-4 rounded-2xl border border-red-300/30 bg-red-400/10 px-4 py-3 text-sm font-semibold text-red-100">
@@ -396,8 +392,8 @@ onUnmounted(() => {
             <p class="text-sm font-bold text-flovi-sky">Available</p>
             <p class="mt-3 text-5xl font-black">{{ requestStats.available }}</p>
           </div>
-          <div class="rounded-[1.7rem] bg-flovi-lemon/[0.16] p-5 ring-1 ring-flovi-lemon/20">
-            <p class="text-sm font-bold text-flovi-lemon">Booked</p>
+          <div class="rounded-[1.7rem] bg-flovi-sky/[0.16] p-5 ring-1 ring-flovi-sky/30">
+            <p class="text-sm font-bold text-flovi-sky">Booked</p>
             <p class="mt-3 text-5xl font-black">{{ requestStats.booked }}</p>
           </div>
           <div class="rounded-[1.7rem] bg-flovi-lilac/[0.16] p-5 ring-1 ring-flovi-lilac/20">
