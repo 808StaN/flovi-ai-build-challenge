@@ -295,36 +295,36 @@ onUnmounted(() => {
       <div class="mx-auto flex max-w-7xl justify-end px-5 py-2 text-xs font-black sm:px-8 lg:px-10">
         <span class="rounded-full bg-flovi-night px-4 py-1 text-flovi-mint">For dispatch teams</span>
       </div>
-
-      <nav class="bg-flovi-night">
-        <div class="mx-auto flex max-w-7xl items-center justify-between px-5 py-4 sm:px-8 lg:px-10">
-          <div class="flex items-center gap-3">
-            <div class="text-2xl font-black tracking-tight">Flovi</div>
-            <span class="hidden rounded-full bg-white/10 px-3 py-1 text-xs font-bold text-white/70 sm:inline-flex">Dispatcher</span>
-          </div>
-
-          <div class="hidden items-center gap-6 text-sm font-extrabold text-white/80 md:flex">
-            <span>Requests</span>
-            <span>Drivers</span>
-            <span>Realtime ops</span>
-          </div>
-
-          <div v-if="session" class="flex items-center gap-3">
-            <p class="hidden max-w-44 truncate text-right text-sm font-bold sm:block">{{ userName }}</p>
-            <div class="flex h-10 w-10 items-center justify-center rounded-full bg-flovi-mint text-sm font-black text-flovi-night">
-              {{ userInitials }}
-            </div>
-            <button class="rounded-full border border-white/20 px-4 py-2 text-sm font-black text-white transition hover:border-flovi-mint hover:text-flovi-mint" type="button" @click="signOut">
-              Sign out
-            </button>
-          </div>
-        </div>
-      </nav>
     </header>
+
+    <nav class="sticky top-0 z-50 bg-flovi-night text-white shadow-card">
+      <div class="mx-auto flex max-w-7xl items-center justify-between px-5 py-4 sm:px-8 lg:px-10">
+        <div class="flex items-center gap-3">
+          <div class="text-2xl font-black tracking-tight">Flovi</div>
+          <span class="hidden rounded-full bg-white/10 px-3 py-1 text-xs font-bold text-white/70 sm:inline-flex">Dispatcher</span>
+        </div>
+
+        <div class="hidden items-center gap-6 text-sm font-extrabold text-white/80 md:flex">
+          <span>Requests</span>
+          <span>Drivers</span>
+          <span>Realtime ops</span>
+        </div>
+
+        <div v-if="session" class="flex items-center gap-3">
+          <p class="hidden max-w-44 truncate text-right text-sm font-bold sm:block">{{ userName }}</p>
+          <div class="flex h-10 w-10 items-center justify-center rounded-full bg-flovi-mint text-sm font-black text-flovi-night">
+            {{ userInitials }}
+          </div>
+          <button class="rounded-full border border-white/20 px-4 py-2 text-sm font-black text-white transition hover:border-flovi-mint hover:text-flovi-mint" type="button" @click="signOut">
+            Sign out
+          </button>
+        </div>
+      </div>
+    </nav>
 
     <template v-if="!session">
       <section class="relative overflow-hidden bg-flovi-night text-white">
-        <div class="absolute inset-0 bg-[radial-gradient(circle_at_80%_20%,rgba(52,245,166,0.25),transparent_30%),linear-gradient(120deg,rgba(16,11,47,0.98),rgba(23,17,63,0.78))]" />
+        <div class="absolute inset-0 bg-[radial-gradient(circle_at_80%_20%,rgba(98,70,234,0.28),transparent_32%),linear-gradient(120deg,rgba(16,11,47,0.98),rgba(23,17,63,0.82))]" />
         <div class="relative mx-auto grid max-w-7xl items-center gap-10 px-5 py-16 sm:px-8 lg:grid-cols-[1fr_0.9fr] lg:px-10 lg:py-24">
           <div>
             <p class="mb-5 inline-flex rounded-full bg-flovi-mint px-4 py-2 text-sm font-black text-flovi-night">Relocation dispatch, simplified</p>
@@ -332,7 +332,7 @@ onUnmounted(() => {
               Intelligent car relocation operations for teams.
             </h1>
             <p class="mt-6 max-w-2xl text-base font-semibold leading-8 text-white/[0.78] sm:text-lg">
-              Create requests, monitor booking status, and keep drivers synced from one polished Flovi-style command center.
+              Create requests, track bookings, and keep drivers updated in one clear dispatch view.
             </p>
             <div class="mt-8 flex flex-col gap-3 sm:flex-row">
               <button
@@ -356,9 +356,6 @@ onUnmounted(() => {
 
           <aside class="relative rounded-[2rem] bg-white p-5 text-flovi-night shadow-card sm:p-6">
             <div class="absolute -right-3 top-8 rotate-12 rounded-xl bg-flovi-mint px-4 py-3 text-center text-xs font-black uppercase leading-none shadow-card">
-              Let's<br />go
-            </div>
-            <div class="absolute -left-2 bottom-8 -rotate-6 rounded-xl bg-flovi-lemon px-4 py-3 text-center text-xs font-black uppercase leading-none shadow-card">
               Hit the<br />road
             </div>
 
