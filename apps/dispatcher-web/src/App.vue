@@ -324,7 +324,7 @@ onUnmounted(() => {
 
     <template v-if="!session">
       <section class="relative overflow-hidden bg-flovi-night text-white">
-        <div class="absolute inset-0 bg-[radial-gradient(circle_at_80%_20%,rgba(98,70,234,0.28),transparent_32%),linear-gradient(120deg,rgba(16,11,47,0.98),rgba(23,17,63,0.82))]" />
+        <div class="absolute inset-0 bg-[linear-gradient(120deg,rgba(16,11,47,0.98),rgba(23,17,63,0.92))]" />
         <div class="relative mx-auto grid max-w-7xl items-center gap-10 px-5 py-16 sm:px-8 lg:grid-cols-[1fr_0.9fr] lg:px-10 lg:py-24">
           <div>
             <p class="mb-5 inline-flex rounded-full bg-flovi-mint px-4 py-2 text-sm font-black text-flovi-night">Relocation dispatch, simplified</p>
