@@ -290,121 +290,180 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <main class="min-h-screen overflow-hidden bg-flovi-ink text-white">
-    <div class="pointer-events-none fixed inset-0">
-      <div class="absolute -left-28 top-[-9rem] h-96 w-96 rounded-full bg-flovi-violet/[0.35] blur-3xl" />
-      <div class="absolute right-[-8rem] top-20 h-[30rem] w-[30rem] rounded-full bg-flovi-mint/20 blur-3xl" />
-      <div class="absolute bottom-[-16rem] left-1/3 h-[28rem] w-[28rem] rounded-full bg-flovi-sky/10 blur-3xl" />
-    </div>
-
-    <section class="relative mx-auto flex min-h-screen w-full max-w-7xl flex-col px-5 py-6 sm:px-8 lg:px-10">
-      <nav class="flex items-center justify-between rounded-full border border-white/10 bg-white/[0.08] px-4 py-3 shadow-card backdrop-blur-xl sm:px-5">
-        <div class="flex items-center gap-3">
-          <div class="flex h-11 w-11 items-center justify-center rounded-2xl bg-flovi-mint text-lg font-black text-flovi-ink shadow-glow">
-            F
-          </div>
-          <div>
-            <p class="text-sm font-bold tracking-[0.28em] text-flovi-mint">FLOVI</p>
-            <p class="text-xs text-white/[0.55]">Dispatcher Control</p>
-          </div>
-        </div>
-
-        <div v-if="session" class="flex items-center gap-3">
-          <div class="hidden text-right sm:block">
-            <p class="text-sm font-semibold">{{ userName }}</p>
-          </div>
-          <div class="flex h-10 w-10 items-center justify-center rounded-full bg-white text-sm font-black text-flovi-night">
-            {{ userInitials }}
-          </div>
-          <button class="rounded-full border border-white/[0.15] px-4 py-2 text-sm font-bold text-white/80 transition hover:border-white/30 hover:bg-white/10" type="button" @click="signOut">
-            Sign out
-          </button>
-        </div>
-      </nav>
-
-      <div v-if="!session" class="grid flex-1 items-center gap-10 py-12 lg:grid-cols-[1fr_0.82fr] lg:py-16">
-        <div class="max-w-3xl">
-          <div class="mb-6 inline-flex rounded-full border border-flovi-mint/30 bg-flovi-mint/10 px-4 py-2 text-sm font-bold text-flovi-mint">
-            Relocation ops, ready for dispatch
-          </div>
-
-          <h1 class="text-5xl font-black leading-[0.95] tracking-tight text-white sm:text-6xl lg:text-7xl">
-            Move requests, booked gigs, one shared command center.
-          </h1>
-
-          <p class="mt-6 max-w-2xl text-lg leading-8 text-white/[0.68]">
-            Sign in to create relocation requests, track availability, and watch booking status update from the shared Supabase backend.
-          </p>
-
-          <div class="mt-8 flex flex-col gap-3 sm:flex-row">
-            <button
-              class="rounded-full bg-flovi-mint px-6 py-4 text-base font-black text-flovi-ink shadow-glow transition hover:-translate-y-0.5 hover:bg-[#7cffc6] disabled:cursor-not-allowed disabled:opacity-60"
-              type="button"
-              :disabled="isAuthLoading"
-              @click="signInWithGoogle"
-            >
-              Continue with Google
-            </button>
-          </div>
-
-          <p v-if="authError" class="mt-4 rounded-2xl border border-red-300/30 bg-red-400/10 px-4 py-3 text-sm font-semibold text-red-100">
-            {{ authError }}
-          </p>
-
-          <p v-if="!isSupabaseConfigured" class="mt-4 rounded-2xl border border-flovi-lemon/30 bg-flovi-lemon/10 px-4 py-3 text-sm font-semibold text-flovi-lemon">
-            Supabase env vars are not configured yet. Copy `.env.example` to `.env.local` and add project credentials.
-          </p>
-        </div>
-
-        <aside class="rounded-[2rem] border border-white/10 bg-white/[0.09] p-4 shadow-card backdrop-blur-2xl sm:p-5">
-          <div class="rounded-[1.5rem] bg-white p-5 text-flovi-night sm:p-6">
-            <p class="text-sm font-black uppercase tracking-[0.24em] text-flovi-violet">Workflow</p>
-            <h2 class="mt-2 text-3xl font-black">Create. Sync. Book.</h2>
-            <div class="mt-6 space-y-3">
-              <div class="rounded-3xl bg-flovi-sky/[0.45] p-4 font-bold">1. Dispatcher creates a relocation request.</div>
-              <div class="rounded-3xl bg-flovi-lemon/70 p-4 font-bold">2. Driver sees it as available.</div>
-              <div class="rounded-3xl bg-flovi-lilac/70 p-4 font-bold">3. Booking updates the dispatcher board.</div>
-            </div>
-          </div>
-        </aside>
+  <main class="min-h-screen bg-white text-flovi-night">
+    <header class="bg-flovi-violet text-white">
+      <div class="mx-auto flex max-w-7xl justify-end px-5 py-2 text-xs font-black sm:px-8 lg:px-10">
+        <span class="rounded-full bg-flovi-night px-4 py-1 text-flovi-mint">For dispatch teams</span>
       </div>
 
-      <div v-else class="py-10 lg:py-12">
-        <header class="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
-          <div>
-            <div class="mb-4 inline-flex rounded-full border border-flovi-mint/30 bg-flovi-mint/10 px-4 py-2 text-sm font-bold text-flovi-mint">
-              Live dispatcher board
+      <nav class="bg-flovi-night">
+        <div class="mx-auto flex max-w-7xl items-center justify-between px-5 py-4 sm:px-8 lg:px-10">
+          <div class="flex items-center gap-3">
+            <div class="text-2xl font-black tracking-tight">Flovi</div>
+            <span class="hidden rounded-full bg-white/10 px-3 py-1 text-xs font-bold text-white/70 sm:inline-flex">Dispatcher</span>
+          </div>
+
+          <div class="hidden items-center gap-6 text-sm font-extrabold text-white/80 md:flex">
+            <span>Requests</span>
+            <span>Drivers</span>
+            <span>Realtime ops</span>
+          </div>
+
+          <div v-if="session" class="flex items-center gap-3">
+            <p class="hidden max-w-44 truncate text-right text-sm font-bold sm:block">{{ userName }}</p>
+            <div class="flex h-10 w-10 items-center justify-center rounded-full bg-flovi-mint text-sm font-black text-flovi-night">
+              {{ userInitials }}
             </div>
-            <h1 class="max-w-4xl text-4xl font-black leading-none tracking-tight sm:text-5xl lg:text-6xl">
-              Relocation requests moving through one shared pipeline.
+            <button class="rounded-full border border-white/20 px-4 py-2 text-sm font-black text-white transition hover:border-flovi-mint hover:text-flovi-mint" type="button" @click="signOut">
+              Sign out
+            </button>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <template v-if="!session">
+      <section class="relative overflow-hidden bg-flovi-night text-white">
+        <div class="absolute inset-0 bg-[radial-gradient(circle_at_80%_20%,rgba(52,245,166,0.25),transparent_30%),linear-gradient(120deg,rgba(16,11,47,0.98),rgba(23,17,63,0.78))]" />
+        <div class="relative mx-auto grid max-w-7xl items-center gap-10 px-5 py-16 sm:px-8 lg:grid-cols-[1fr_0.9fr] lg:px-10 lg:py-24">
+          <div>
+            <p class="mb-5 inline-flex rounded-full bg-flovi-mint px-4 py-2 text-sm font-black text-flovi-night">Relocation dispatch, simplified</p>
+            <h1 class="max-w-4xl text-5xl font-black leading-[0.95] tracking-tight sm:text-6xl lg:text-7xl">
+              Intelligent car relocation operations for teams.
             </h1>
-            <p class="mt-4 max-w-2xl text-base leading-7 text-white/[0.68]">
-              Create and edit relocation jobs here. Driver bookings appear automatically through Supabase realtime updates.
+            <p class="mt-6 max-w-2xl text-base font-semibold leading-8 text-white/[0.78] sm:text-lg">
+              Create requests, monitor booking status, and keep drivers synced from one polished Flovi-style command center.
+            </p>
+            <div class="mt-8 flex flex-col gap-3 sm:flex-row">
+              <button
+                class="rounded-full bg-flovi-mint px-6 py-4 text-base font-black text-flovi-night shadow-glow transition hover:-translate-y-0.5 hover:bg-[#7cffc6] disabled:cursor-not-allowed disabled:opacity-60"
+                type="button"
+                :disabled="isAuthLoading"
+                @click="signInWithGoogle"
+              >
+                Continue with Google
+              </button>
+            </div>
+
+            <p v-if="authError" class="mt-4 max-w-xl rounded-2xl border border-red-200/40 bg-red-400/[0.15] px-4 py-3 text-sm font-bold text-red-50">
+              {{ authError }}
+            </p>
+
+            <p v-if="!isSupabaseConfigured" class="mt-4 max-w-xl rounded-2xl border border-flovi-lemon/40 bg-flovi-lemon/[0.15] px-4 py-3 text-sm font-bold text-flovi-lemon">
+              Supabase env vars are not configured yet. Copy `.env.example` to `.env.local` and add project credentials.
             </p>
           </div>
-          <button class="rounded-full border border-white/[0.15] px-5 py-3 text-sm font-black text-white transition hover:border-white/30 hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-60" type="button" :disabled="isRequestsLoading" @click="fetchRequests">
-            {{ isRequestsLoading ? 'Refreshing...' : 'Refresh board' }}
-          </button>
+
+          <aside class="relative rounded-[2rem] bg-white p-5 text-flovi-night shadow-card sm:p-6">
+            <div class="absolute -right-3 top-8 rotate-12 rounded-xl bg-flovi-mint px-4 py-3 text-center text-xs font-black uppercase leading-none shadow-card">
+              Let's<br />go
+            </div>
+            <div class="absolute -left-2 bottom-8 -rotate-6 rounded-xl bg-flovi-lemon px-4 py-3 text-center text-xs font-black uppercase leading-none shadow-card">
+              Hit the<br />road
+            </div>
+
+            <p class="text-sm font-black uppercase tracking-[0.22em] text-flovi-violet">Live workflow</p>
+            <h2 class="mt-3 text-3xl font-black">Create. Sync. Book.</h2>
+            <div class="mt-6 grid gap-3">
+              <div class="rounded-3xl bg-flovi-sky/50 p-4 font-bold">1. Dispatcher creates a relocation request.</div>
+              <div class="rounded-3xl bg-flovi-mint/[0.35] p-4 font-bold">2. Driver sees it as available.</div>
+              <div class="rounded-3xl bg-flovi-lilac/60 p-4 font-bold">3. Booking updates the board instantly.</div>
+            </div>
+          </aside>
+        </div>
+      </section>
+
+      <section class="bg-white px-5 py-14 sm:px-8 lg:px-10">
+        <div class="mx-auto grid max-w-7xl gap-8 lg:grid-cols-[0.8fr_1.2fr] lg:items-center">
+          <h2 class="text-3xl font-black leading-tight sm:text-4xl">Move requests faster, cleaner, and with fewer status checks.</h2>
+          <p class="text-base font-semibold leading-8 text-flovi-night/70">
+            The demo uses Supabase auth, shared request data, and realtime refresh so dispatch and drivers stay aligned through the same relocation pipeline.
+          </p>
+        </div>
+      </section>
+
+      <section class="bg-flovi-night px-5 py-12 text-white sm:px-8 lg:px-10">
+        <div class="mx-auto grid max-w-5xl gap-6 text-center md:grid-cols-3">
+          <div>
+            <p class="text-5xl font-black">3</p>
+            <p class="mt-2 text-sm font-bold text-white/70">Core request states</p>
+          </div>
+          <div>
+            <p class="text-5xl font-black">1</p>
+            <p class="mt-2 text-sm font-bold text-white/70">Shared Supabase table</p>
+          </div>
+          <div>
+            <p class="text-5xl font-black">0</p>
+            <p class="mt-2 text-sm font-bold text-white/70">Manual booking calls</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="bg-flovi-violet px-5 py-14 text-white sm:px-8 lg:px-10">
+        <div class="mx-auto max-w-7xl">
+          <h2 class="text-center text-3xl font-black">Dispatcher tools</h2>
+          <div class="mx-auto mt-5 flex max-w-2xl rounded-full bg-flovi-night p-1 text-xs font-black">
+            <span class="flex-1 rounded-full bg-flovi-sky px-4 py-3 text-center text-flovi-night">Create jobs</span>
+            <span class="flex-1 px-4 py-3 text-center text-white/80">Track bookings</span>
+            <span class="flex-1 px-4 py-3 text-center text-white/80">Sync drivers</span>
+          </div>
+          <div class="mt-8 grid gap-5 md:grid-cols-3">
+            <article class="rounded-3xl bg-flovi-sky p-6 text-flovi-night">
+              <h3 class="text-xl font-black">Fast request intake</h3>
+              <p class="mt-3 text-sm font-bold leading-6 text-flovi-night/70">Capture origin, destination, dates, and move notes in one clean flow.</p>
+            </article>
+            <article class="rounded-3xl bg-flovi-mint p-6 text-flovi-night">
+              <h3 class="text-xl font-black">Driver-ready jobs</h3>
+              <p class="mt-3 text-sm font-bold leading-6 text-flovi-night/70">Available requests become bookable from the connected driver web app.</p>
+            </article>
+            <article class="rounded-3xl bg-flovi-lemon p-6 text-flovi-night">
+              <h3 class="text-xl font-black">Clear status flow</h3>
+              <p class="mt-3 text-sm font-bold leading-6 text-flovi-night/70">Available, booked, and completed states stay visible across the board.</p>
+            </article>
+          </div>
+        </div>
+      </section>
+    </template>
+
+    <section v-else class="bg-[#F7F6FF] px-5 py-10 sm:px-8 lg:px-10">
+      <div class="mx-auto max-w-7xl">
+        <header class="rounded-[2rem] bg-flovi-night p-6 text-white shadow-card sm:p-8 lg:p-10">
+          <div class="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+            <div>
+              <div class="mb-4 inline-flex rounded-full bg-flovi-mint px-4 py-2 text-sm font-black text-flovi-night">
+                Live dispatcher board
+              </div>
+              <h1 class="max-w-4xl text-4xl font-black leading-none tracking-tight sm:text-5xl lg:text-6xl">
+                Relocation requests moving through one shared pipeline.
+              </h1>
+              <p class="mt-4 max-w-2xl text-base font-semibold leading-7 text-white/70">
+                Create and edit relocation jobs here. Driver bookings appear automatically through Supabase realtime updates.
+              </p>
+            </div>
+            <button class="rounded-full border border-flovi-mint px-5 py-3 text-sm font-black text-flovi-mint transition hover:bg-flovi-mint hover:text-flovi-night disabled:cursor-not-allowed disabled:opacity-60" type="button" :disabled="isRequestsLoading" @click="fetchRequests">
+              {{ isRequestsLoading ? 'Refreshing...' : 'Refresh board' }}
+            </button>
+          </div>
         </header>
 
-        <section class="mt-8 grid gap-4 md:grid-cols-3">
-          <div class="rounded-[1.7rem] bg-flovi-sky/[0.18] p-5 ring-1 ring-flovi-sky/20">
-            <p class="text-sm font-bold text-flovi-sky">Available</p>
+        <section class="mt-6 grid gap-4 md:grid-cols-3">
+          <div class="rounded-[1.7rem] bg-flovi-mint p-5 text-flovi-night shadow-card">
+            <p class="text-sm font-black">Available</p>
             <p class="mt-3 text-5xl font-black">{{ requestStats.available }}</p>
           </div>
-          <div class="rounded-[1.7rem] bg-flovi-sky/[0.16] p-5 ring-1 ring-flovi-sky/30">
-            <p class="text-sm font-bold text-flovi-sky">Booked</p>
+          <div class="rounded-[1.7rem] bg-flovi-sky p-5 text-flovi-night shadow-card">
+            <p class="text-sm font-black">Booked</p>
             <p class="mt-3 text-5xl font-black">{{ requestStats.booked }}</p>
           </div>
-          <div class="rounded-[1.7rem] bg-flovi-lilac/[0.16] p-5 ring-1 ring-flovi-lilac/20">
-            <p class="text-sm font-bold text-flovi-lilac">Completed</p>
+          <div class="rounded-[1.7rem] bg-flovi-lilac p-5 text-flovi-night shadow-card">
+            <p class="text-sm font-black">Completed</p>
             <p class="mt-3 text-5xl font-black">{{ requestStats.completed }}</p>
           </div>
         </section>
 
-        <div class="mt-8 grid gap-6 xl:grid-cols-[0.9fr_1.35fr]">
-          <section class="rounded-[2rem] border border-white/10 bg-white/[0.09] p-4 shadow-card backdrop-blur-2xl sm:p-5">
-            <form class="rounded-[1.5rem] bg-white p-5 text-flovi-night sm:p-6" @submit.prevent="submitRequest">
+        <div class="mt-6 grid gap-6 xl:grid-cols-[0.9fr_1.35fr]">
+          <section class="rounded-[2rem] bg-white p-4 shadow-card sm:p-5">
+            <form class="rounded-[1.5rem] border border-flovi-night/10 bg-white p-5 text-flovi-night sm:p-6" @submit.prevent="submitRequest">
               <p class="text-sm font-black uppercase tracking-[0.24em] text-flovi-violet">
                 {{ isEditing ? 'Edit request' : 'New relocation' }}
               </p>
@@ -415,42 +474,42 @@ onUnmounted(() => {
               <div class="mt-6 grid gap-4">
                 <label class="block">
                   <span class="text-sm font-black text-flovi-night/70">Origin</span>
-                  <input v-model="form.origin" class="mt-2 w-full rounded-2xl border border-flovi-night/10 bg-flovi-night/[0.04] px-4 py-3 font-semibold outline-none transition focus:border-flovi-violet focus:ring-4 focus:ring-flovi-violet/10" required placeholder="Austin, TX" type="text" />
+                  <input v-model="form.origin" class="mt-2 w-full rounded-2xl border border-flovi-night/10 bg-[#F7F6FF] px-4 py-3 font-semibold outline-none transition focus:border-flovi-violet focus:ring-4 focus:ring-flovi-violet/10" required placeholder="Austin, TX" type="text" />
                 </label>
 
                 <label class="block">
                   <span class="text-sm font-black text-flovi-night/70">Destination</span>
-                  <input v-model="form.destination" class="mt-2 w-full rounded-2xl border border-flovi-night/10 bg-flovi-night/[0.04] px-4 py-3 font-semibold outline-none transition focus:border-flovi-violet focus:ring-4 focus:ring-flovi-violet/10" required placeholder="Denver, CO" type="text" />
+                  <input v-model="form.destination" class="mt-2 w-full rounded-2xl border border-flovi-night/10 bg-[#F7F6FF] px-4 py-3 font-semibold outline-none transition focus:border-flovi-violet focus:ring-4 focus:ring-flovi-violet/10" required placeholder="Denver, CO" type="text" />
                 </label>
 
                 <label class="block">
                   <span class="text-sm font-black text-flovi-night/70">Move date</span>
-                  <input v-model="form.move_date" class="mt-2 w-full rounded-2xl border border-flovi-night/10 bg-flovi-night/[0.04] px-4 py-3 font-semibold outline-none transition focus:border-flovi-violet focus:ring-4 focus:ring-flovi-violet/10" required type="date" />
+                  <input v-model="form.move_date" class="mt-2 w-full rounded-2xl border border-flovi-night/10 bg-[#F7F6FF] px-4 py-3 font-semibold outline-none transition focus:border-flovi-violet focus:ring-4 focus:ring-flovi-violet/10" required type="date" />
                 </label>
 
                 <label class="block">
                   <span class="text-sm font-black text-flovi-night/70">Notes</span>
-                  <textarea v-model="form.notes" class="mt-2 min-h-28 w-full resize-none rounded-2xl border border-flovi-night/10 bg-flovi-night/[0.04] px-4 py-3 font-semibold outline-none transition focus:border-flovi-violet focus:ring-4 focus:ring-flovi-violet/10" placeholder="Elevator access, preferred pickup window, special handling..." />
+                  <textarea v-model="form.notes" class="mt-2 min-h-28 w-full resize-none rounded-2xl border border-flovi-night/10 bg-[#F7F6FF] px-4 py-3 font-semibold outline-none transition focus:border-flovi-violet focus:ring-4 focus:ring-flovi-violet/10" placeholder="Elevator access, preferred pickup window, special handling..." />
                 </label>
               </div>
 
-              <p v-if="requestsError" class="mt-4 rounded-2xl border border-red-300/40 bg-red-50 px-4 py-3 text-sm font-bold text-red-700">
+              <p v-if="requestsError" class="mt-4 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-bold text-red-700">
                 {{ requestsError }}
               </p>
 
               <div class="mt-6 flex flex-col gap-3 sm:flex-row">
-                <button class="rounded-full bg-flovi-mint px-6 py-4 text-base font-black text-flovi-ink shadow-glow transition hover:-translate-y-0.5 hover:bg-[#7cffc6] disabled:cursor-not-allowed disabled:opacity-60" type="submit" :disabled="isSaving">
+                <button class="rounded-full bg-flovi-mint px-6 py-4 text-base font-black text-flovi-night shadow-glow transition hover:-translate-y-0.5 hover:bg-[#7cffc6] disabled:cursor-not-allowed disabled:opacity-60" type="submit" :disabled="isSaving">
                   {{ isSaving ? 'Saving...' : isEditing ? 'Save changes' : 'Create request' }}
                 </button>
-                <button v-if="isEditing" class="rounded-full border border-flovi-night/10 px-6 py-4 text-base font-black text-flovi-night transition hover:bg-flovi-night/5" type="button" @click="resetForm">
+                <button v-if="isEditing" class="rounded-full border border-flovi-night/[0.15] px-6 py-4 text-base font-black text-flovi-night transition hover:bg-flovi-night/5" type="button" @click="resetForm">
                   Cancel edit
                 </button>
               </div>
             </form>
           </section>
 
-          <section class="rounded-[2rem] border border-white/10 bg-white/[0.09] p-4 shadow-card backdrop-blur-2xl sm:p-5">
-            <div class="rounded-[1.5rem] bg-white p-5 text-flovi-night sm:p-6">
+          <section class="rounded-[2rem] bg-white p-4 shadow-card sm:p-5">
+            <div class="rounded-[1.5rem] border border-flovi-night/10 bg-white p-5 text-flovi-night sm:p-6">
               <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                 <div>
                   <p class="text-sm font-black uppercase tracking-[0.24em] text-flovi-violet">All requests</p>
@@ -461,7 +520,7 @@ onUnmounted(() => {
                 </span>
               </div>
 
-              <div v-if="isRequestsLoading && !sortedRequests.length" class="mt-6 rounded-3xl bg-flovi-night/[0.04] p-6 text-center font-bold text-flovi-night/60">
+              <div v-if="isRequestsLoading && !sortedRequests.length" class="mt-6 rounded-3xl bg-[#F7F6FF] p-6 text-center font-bold text-flovi-night/60">
                 Loading relocation requests...
               </div>
 
@@ -471,14 +530,14 @@ onUnmounted(() => {
               </div>
 
               <div v-else class="mt-6 space-y-4">
-                <article v-for="request in sortedRequests" :key="request.id" class="rounded-3xl border border-flovi-night/10 bg-flovi-night/[0.035] p-4 transition hover:-translate-y-0.5 hover:bg-flovi-night/[0.055] sm:p-5">
+                <article v-for="request in sortedRequests" :key="request.id" class="rounded-3xl border border-flovi-night/10 bg-[#F7F6FF] p-4 transition hover:-translate-y-0.5 hover:bg-white sm:p-5">
                   <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                     <div>
                       <div class="flex flex-wrap items-center gap-2">
                         <span class="rounded-full border px-3 py-1 text-xs font-black uppercase tracking-[0.16em]" :class="statusBadgeClass(request.status)">
                           {{ statusLabel(request.status) }}
                         </span>
-                        <span v-if="canEdit(request)" class="rounded-full bg-flovi-mint/20 px-3 py-1 text-xs font-black text-flovi-night">
+                        <span v-if="canEdit(request)" class="rounded-full bg-flovi-mint px-3 py-1 text-xs font-black text-flovi-night">
                           Your request
                         </span>
                       </div>
