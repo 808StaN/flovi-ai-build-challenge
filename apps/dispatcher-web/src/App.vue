@@ -422,13 +422,9 @@ onUnmounted(() => {
       </section>
     </template>
 
-    <section v-else class="relative overflow-hidden bg-white px-5 py-10 sm:px-8 lg:px-10">
-      <div class="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,#ffffff_0%,#f7f6ff_45%,#ffffff_100%)]" />
-      <div class="pointer-events-none absolute -right-28 top-28 h-80 w-80 rounded-full bg-flovi-lilac/[0.22] blur-3xl" />
-      <div class="pointer-events-none absolute -left-24 bottom-10 h-72 w-72 rounded-full bg-flovi-sky/[0.18] blur-3xl" />
-
-      <div class="relative mx-auto max-w-7xl">
-        <header class="rounded-[2rem] bg-[linear-gradient(135deg,#100b2f,#17113f)] p-6 text-white shadow-card sm:p-8 lg:p-10">
+    <section v-else class="bg-flovi-night px-5 py-10 text-white sm:px-8 lg:px-10">
+      <div class="mx-auto max-w-7xl">
+        <header class="rounded-[2rem] border border-white/10 bg-[linear-gradient(135deg,#100b2f,#241768)] p-6 text-white shadow-card sm:p-8 lg:p-10">
           <div class="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
             <div>
               <div class="mb-4 inline-flex rounded-full bg-flovi-mint px-4 py-2 text-sm font-black text-flovi-night">
@@ -447,139 +443,158 @@ onUnmounted(() => {
           </div>
         </header>
 
-        <section class="mt-6 grid gap-4 md:grid-cols-3">
-          <div class="rounded-[1.7rem] border border-flovi-night/10 bg-flovi-mint p-5 text-flovi-night shadow-card">
-            <p class="text-sm font-black">Available</p>
-            <p class="mt-3 text-5xl font-black">{{ requestStats.available }}</p>
-          </div>
-          <div class="rounded-[1.7rem] border border-flovi-night/10 bg-flovi-sky p-5 text-flovi-night shadow-card">
-            <p class="text-sm font-black">Booked</p>
-            <p class="mt-3 text-5xl font-black">{{ requestStats.booked }}</p>
-          </div>
-          <div class="rounded-[1.7rem] border border-flovi-night/10 bg-flovi-lilac p-5 text-flovi-night shadow-card">
-            <p class="text-sm font-black">Completed</p>
-            <p class="mt-3 text-5xl font-black">{{ requestStats.completed }}</p>
+        <section class="mt-6 rounded-[2rem] border border-white/10 bg-white/[0.08] p-3 shadow-card backdrop-blur">
+          <div class="grid gap-3 md:grid-cols-3">
+            <div class="rounded-[1.5rem] bg-flovi-mint p-5 text-flovi-night">
+              <p class="text-sm font-black uppercase tracking-[0.16em]">Available</p>
+              <div class="mt-4 flex items-end justify-between gap-4">
+                <p class="text-5xl font-black leading-none">{{ requestStats.available }}</p>
+                <p class="max-w-28 text-right text-xs font-black leading-4 text-flovi-night/60">Ready for drivers</p>
+              </div>
+            </div>
+            <div class="rounded-[1.5rem] bg-flovi-sky p-5 text-flovi-night">
+              <p class="text-sm font-black uppercase tracking-[0.16em]">Booked</p>
+              <div class="mt-4 flex items-end justify-between gap-4">
+                <p class="text-5xl font-black leading-none">{{ requestStats.booked }}</p>
+                <p class="max-w-28 text-right text-xs font-black leading-4 text-flovi-night/60">Assigned work</p>
+              </div>
+            </div>
+            <div class="rounded-[1.5rem] bg-flovi-lilac p-5 text-flovi-night">
+              <p class="text-sm font-black uppercase tracking-[0.16em]">Completed</p>
+              <div class="mt-4 flex items-end justify-between gap-4">
+                <p class="text-5xl font-black leading-none">{{ requestStats.completed }}</p>
+                <p class="max-w-28 text-right text-xs font-black leading-4 text-flovi-night/60">Finished moves</p>
+              </div>
+            </div>
           </div>
         </section>
 
-        <div class="mt-6 grid gap-6 xl:grid-cols-[0.9fr_1.35fr]">
-          <section class="rounded-[2rem] border border-flovi-night/10 bg-white/95 p-4 shadow-card backdrop-blur sm:p-5">
-            <form class="rounded-[1.5rem] border border-flovi-night/10 bg-[linear-gradient(180deg,#ffffff,#fbfaff)] p-5 text-flovi-night sm:p-6" @submit.prevent="submitRequest">
-              <p class="text-sm font-black uppercase tracking-[0.24em] text-flovi-violet">
-                {{ isEditing ? 'Edit request' : 'New relocation' }}
-              </p>
-              <h2 class="mt-2 text-3xl font-black">
-                {{ isEditing ? 'Update job details' : 'Create a request' }}
-              </h2>
+        <div class="mt-8 rounded-[2.4rem] bg-white p-3 text-flovi-night shadow-card sm:p-5">
+          <div class="grid gap-5 xl:grid-cols-[0.78fr_1.22fr]">
+            <form class="overflow-hidden rounded-[2rem] border border-flovi-night/10 bg-white" @submit.prevent="submitRequest">
+              <div class="bg-flovi-violet p-6 text-white">
+                <p class="text-sm font-black uppercase tracking-[0.24em] text-flovi-mint">
+                  {{ isEditing ? 'Edit request' : 'New relocation' }}
+                </p>
+                <h2 class="mt-2 text-3xl font-black leading-tight">
+                  {{ isEditing ? 'Update job details' : 'Create a request' }}
+                </h2>
+                <p class="mt-3 text-sm font-bold leading-6 text-white/70">
+                  Add the route once. The driver app can pick it up as soon as it is available.
+                </p>
+              </div>
 
-              <div class="mt-6 grid gap-4">
+              <div class="space-y-4 p-5 sm:p-6">
                 <label class="block">
                   <span class="text-sm font-black text-flovi-night/70">Origin</span>
-                  <input v-model="form.origin" class="mt-2 w-full rounded-2xl border border-flovi-night/10 bg-white px-4 py-3 font-semibold shadow-[inset_0_1px_0_rgba(255,255,255,0.9)] outline-none transition placeholder:text-flovi-night/35 focus:border-flovi-violet focus:bg-[#F7F6FF] focus:ring-4 focus:ring-flovi-violet/10" required placeholder="Austin, TX" type="text" />
+                  <input v-model="form.origin" class="mt-2 w-full rounded-2xl border border-flovi-night/10 bg-[#F7F6FF] px-4 py-3 font-semibold outline-none transition placeholder:text-flovi-night/35 focus:border-flovi-violet focus:bg-white focus:ring-4 focus:ring-flovi-violet/10" required placeholder="Austin, TX" type="text" />
                 </label>
 
                 <label class="block">
                   <span class="text-sm font-black text-flovi-night/70">Destination</span>
-                  <input v-model="form.destination" class="mt-2 w-full rounded-2xl border border-flovi-night/10 bg-white px-4 py-3 font-semibold shadow-[inset_0_1px_0_rgba(255,255,255,0.9)] outline-none transition placeholder:text-flovi-night/35 focus:border-flovi-violet focus:bg-[#F7F6FF] focus:ring-4 focus:ring-flovi-violet/10" required placeholder="Denver, CO" type="text" />
+                  <input v-model="form.destination" class="mt-2 w-full rounded-2xl border border-flovi-night/10 bg-[#F7F6FF] px-4 py-3 font-semibold outline-none transition placeholder:text-flovi-night/35 focus:border-flovi-violet focus:bg-white focus:ring-4 focus:ring-flovi-violet/10" required placeholder="Denver, CO" type="text" />
                 </label>
 
                 <label class="block">
                   <span class="text-sm font-black text-flovi-night/70">Move date</span>
-                  <input v-model="form.move_date" class="mt-2 w-full rounded-2xl border border-flovi-night/10 bg-white px-4 py-3 font-semibold shadow-[inset_0_1px_0_rgba(255,255,255,0.9)] outline-none transition focus:border-flovi-violet focus:bg-[#F7F6FF] focus:ring-4 focus:ring-flovi-violet/10" required type="date" />
+                  <input v-model="form.move_date" class="mt-2 w-full rounded-2xl border border-flovi-night/10 bg-[#F7F6FF] px-4 py-3 font-semibold outline-none transition focus:border-flovi-violet focus:bg-white focus:ring-4 focus:ring-flovi-violet/10" required type="date" />
                 </label>
 
                 <label class="block">
                   <span class="text-sm font-black text-flovi-night/70">Notes</span>
-                  <textarea v-model="form.notes" class="mt-2 min-h-28 w-full resize-none rounded-2xl border border-flovi-night/10 bg-white px-4 py-3 font-semibold shadow-[inset_0_1px_0_rgba(255,255,255,0.9)] outline-none transition placeholder:text-flovi-night/35 focus:border-flovi-violet focus:bg-[#F7F6FF] focus:ring-4 focus:ring-flovi-violet/10" placeholder="Elevator access, preferred pickup window, special handling..." />
+                  <textarea v-model="form.notes" class="mt-2 min-h-28 w-full resize-none rounded-2xl border border-flovi-night/10 bg-[#F7F6FF] px-4 py-3 font-semibold outline-none transition placeholder:text-flovi-night/35 focus:border-flovi-violet focus:bg-white focus:ring-4 focus:ring-flovi-violet/10" placeholder="Elevator access, preferred pickup window, special handling..." />
                 </label>
-              </div>
 
-              <p v-if="requestsError" class="mt-4 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-bold text-red-700">
-                {{ requestsError }}
-              </p>
+                <p v-if="requestsError" class="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-bold text-red-700">
+                  {{ requestsError }}
+                </p>
 
-              <div class="mt-6 flex flex-col gap-3 sm:flex-row">
-                <button class="rounded-full bg-flovi-mint px-6 py-4 text-base font-black text-flovi-night shadow-glow transition hover:-translate-y-0.5 hover:bg-[#7cffc6] disabled:cursor-not-allowed disabled:opacity-60" type="submit" :disabled="isSaving">
-                  {{ isSaving ? 'Saving...' : isEditing ? 'Save changes' : 'Create request' }}
-                </button>
-                <button v-if="isEditing" class="rounded-full border border-flovi-night/[0.15] px-6 py-4 text-base font-black text-flovi-night transition hover:bg-flovi-night/5" type="button" @click="resetForm">
-                  Cancel edit
-                </button>
+                <div class="flex flex-col gap-3 sm:flex-row">
+                  <button class="rounded-full bg-flovi-mint px-6 py-4 text-base font-black text-flovi-night shadow-glow transition hover:-translate-y-0.5 hover:bg-[#7cffc6] disabled:cursor-not-allowed disabled:opacity-60" type="submit" :disabled="isSaving">
+                    {{ isSaving ? 'Saving...' : isEditing ? 'Save changes' : 'Create request' }}
+                  </button>
+                  <button v-if="isEditing" class="rounded-full border border-flovi-night/[0.15] px-6 py-4 text-base font-black text-flovi-night transition hover:bg-flovi-night/5" type="button" @click="resetForm">
+                    Cancel edit
+                  </button>
+                </div>
               </div>
             </form>
-          </section>
 
-          <section class="rounded-[2rem] border border-flovi-night/10 bg-white/95 p-4 shadow-card backdrop-blur sm:p-5">
-            <div class="rounded-[1.5rem] border border-flovi-night/10 bg-[linear-gradient(180deg,#ffffff,#fbfaff)] p-5 text-flovi-night sm:p-6">
-              <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+            <section class="overflow-hidden rounded-[2rem] border border-flovi-night/10 bg-[#F7F6FF]">
+              <div class="flex flex-col gap-4 bg-white p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6">
                 <div>
                   <p class="text-sm font-black uppercase tracking-[0.24em] text-flovi-violet">All requests</p>
-                  <h2 class="mt-2 text-3xl font-black">Operations queue</h2>
+                  <h2 class="mt-2 text-3xl font-black tracking-tight">Operations queue</h2>
+                  <p class="mt-2 max-w-xl text-sm font-bold leading-6 text-flovi-night/60">Live relocation jobs created by dispatch and synced with the driver app.</p>
                 </div>
                 <span class="rounded-full bg-flovi-night px-4 py-2 text-sm font-black text-white">
                   {{ sortedRequests.length }} total
                 </span>
               </div>
 
-              <div v-if="isRequestsLoading && !sortedRequests.length" class="mt-6 rounded-3xl border border-flovi-night/10 bg-white p-6 text-center font-bold text-flovi-night/60 shadow-[inset_0_1px_0_rgba(255,255,255,0.9)]">
+              <div v-if="isRequestsLoading && !sortedRequests.length" class="m-5 rounded-3xl border border-flovi-night/10 bg-white p-6 text-center font-bold text-flovi-night/60">
                 Loading relocation requests...
               </div>
 
-              <div v-else-if="!sortedRequests.length" class="mt-6 rounded-3xl border border-dashed border-flovi-violet/30 bg-white p-6 text-center shadow-[inset_0_1px_0_rgba(255,255,255,0.9)]">
+              <div v-else-if="!sortedRequests.length" class="m-5 rounded-3xl border border-dashed border-flovi-violet/30 bg-white p-6 text-center">
                 <p class="text-lg font-black">No relocation requests yet.</p>
                 <p class="mt-2 text-sm font-semibold text-flovi-night/60">Create the first request to make it available for drivers.</p>
               </div>
 
-              <div v-else class="mt-6 space-y-4">
-                <article v-for="request in sortedRequests" :key="request.id" class="rounded-3xl border border-flovi-night/10 bg-[linear-gradient(135deg,#f7f6ff,#ffffff)] p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.9)] transition hover:-translate-y-0.5 hover:border-flovi-violet/30 hover:shadow-card sm:p-5">
-                  <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-                    <div>
-                      <div class="flex flex-wrap items-center gap-2">
-                        <span class="rounded-full border px-3 py-1 text-xs font-black uppercase tracking-[0.16em]" :class="statusBadgeClass(request.status)">
-                          {{ statusLabel(request.status) }}
-                        </span>
-                        <span v-if="canEdit(request)" class="rounded-full bg-flovi-mint px-3 py-1 text-xs font-black text-flovi-night">
-                          Your request
-                        </span>
+              <div v-else class="space-y-4 p-5">
+                <article v-for="request in sortedRequests" :key="request.id" class="overflow-hidden rounded-[1.8rem] border border-flovi-night/10 bg-white shadow-[0_18px_50px_rgba(8,6,28,0.08)] transition hover:-translate-y-0.5 hover:border-flovi-violet/30 hover:shadow-card">
+                  <div class="bg-[linear-gradient(135deg,#ffffff,#f1efff)] p-5">
+                    <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                      <div>
+                        <div class="flex flex-wrap items-center gap-2">
+                          <span class="rounded-full border px-3 py-1 text-xs font-black uppercase tracking-[0.16em]" :class="statusBadgeClass(request.status)">
+                            {{ statusLabel(request.status) }}
+                          </span>
+                          <span v-if="canEdit(request)" class="rounded-full bg-flovi-mint px-3 py-1 text-xs font-black text-flovi-night">
+                            Your request
+                          </span>
+                        </div>
+                        <h3 class="mt-4 text-3xl font-black leading-tight tracking-tight">
+                          {{ request.origin }} <span class="text-flovi-violet">&rarr;</span> {{ request.destination }}
+                        </h3>
+                        <p class="mt-2 text-sm font-bold text-flovi-night/60">
+                          Move date: {{ formatDate(request.move_date) }}
+                        </p>
                       </div>
-                      <h3 class="mt-4 text-2xl font-black leading-tight tracking-tight">
-                        {{ request.origin }} <span class="text-flovi-violet">&rarr;</span> {{ request.destination }}
-                      </h3>
-                      <p class="mt-2 text-sm font-bold text-flovi-night/60">
-                        Move date: {{ formatDate(request.move_date) }}
-                      </p>
-                    </div>
 
-                    <button v-if="canEdit(request)" class="rounded-full bg-flovi-night px-4 py-2 text-sm font-black text-white transition hover:bg-flovi-violet" type="button" @click="startEdit(request)">
-                      Edit
-                    </button>
-                    <span v-else class="rounded-full bg-flovi-night/5 px-4 py-2 text-sm font-black text-flovi-night/50">
-                      Read only
-                    </span>
+                      <button v-if="canEdit(request)" class="rounded-full bg-flovi-night px-4 py-2 text-sm font-black text-white transition hover:bg-flovi-violet" type="button" @click="startEdit(request)">
+                        Edit
+                      </button>
+                      <span v-else class="rounded-full bg-flovi-night/5 px-4 py-2 text-sm font-black text-flovi-night/50">
+                        Read only
+                      </span>
+                    </div>
                   </div>
 
-                  <p class="mt-4 rounded-2xl border border-flovi-night/5 bg-white px-4 py-3 text-sm font-semibold leading-6 text-flovi-night/70">
-                    {{ request.notes || 'No dispatcher notes added.' }}
-                  </p>
+                  <div class="p-5">
+                    <p class="rounded-2xl border border-flovi-night/5 bg-[#F7F6FF] px-4 py-3 text-sm font-semibold leading-6 text-flovi-night/70">
+                      {{ request.notes || 'No dispatcher notes added.' }}
+                    </p>
 
-                  <dl class="mt-4 grid gap-3 text-sm sm:grid-cols-3">
-                    <div class="rounded-2xl border border-flovi-night/5 bg-white px-4 py-3">
-                      <dt class="font-black text-flovi-night/[0.45]">Created</dt>
-                      <dd class="mt-1 font-bold">{{ formatDateTime(request.created_at) }}</dd>
-                    </div>
-                    <div class="rounded-2xl border border-flovi-night/5 bg-white px-4 py-3">
-                      <dt class="font-black text-flovi-night/[0.45]">Booked</dt>
-                      <dd class="mt-1 font-bold">{{ formatDateTime(request.booked_at, 'Not booked yet') }}</dd>
-                    </div>
-                    <div class="rounded-2xl border border-flovi-night/5 bg-white px-4 py-3">
-                      <dt class="font-black text-flovi-night/[0.45]">Driver</dt>
-                      <dd class="mt-1 truncate font-bold">{{ request.driver_id || 'Unassigned' }}</dd>
-                    </div>
-                  </dl>
+                    <dl class="mt-4 grid gap-3 text-sm sm:grid-cols-3">
+                      <div class="rounded-2xl bg-flovi-sky/45 px-4 py-3">
+                        <dt class="font-black text-flovi-night/[0.55]">Created</dt>
+                        <dd class="mt-1 font-black">{{ formatDateTime(request.created_at) }}</dd>
+                      </div>
+                      <div class="rounded-2xl bg-flovi-mint/[0.38] px-4 py-3">
+                        <dt class="font-black text-flovi-night/[0.55]">Booked</dt>
+                        <dd class="mt-1 font-black">{{ formatDateTime(request.booked_at, 'Not booked yet') }}</dd>
+                      </div>
+                      <div class="rounded-2xl bg-flovi-lilac/55 px-4 py-3">
+                        <dt class="font-black text-flovi-night/[0.55]">Driver</dt>
+                        <dd class="mt-1 truncate font-black">{{ request.driver_id || 'Unassigned' }}</dd>
+                      </div>
+                    </dl>
+                  </div>
                 </article>
               </div>
-            </div>
-          </section>
+            </section>
+          </div>
         </div>
       </div>
     </section>
