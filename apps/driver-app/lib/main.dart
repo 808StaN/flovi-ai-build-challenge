@@ -1018,34 +1018,43 @@ class _TopBar extends StatelessWidget {
           ),
           const Spacer(),
           if (isSignedIn) ...[
-            Flexible(
-              child: Text(
-                displayName,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                textAlign: TextAlign.right,
-                style: const TextStyle(
-                  color: Color(0xB3FFFFFF),
-                  fontSize: 12,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-            ),
-            const SizedBox(width: 10),
-            TextButton(
-              onPressed: onSignOut,
-              style: TextButton.styleFrom(
-                foregroundColor: FloviColors.mint,
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(999),
-                  side: const BorderSide(color: FloviColors.mint),
-                ),
-              ),
-              child: const Text(
-                'Sign out',
-                style: TextStyle(fontWeight: FontWeight.w900),
+            Expanded(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  Flexible(
+                    child: Text(
+                      displayName,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      textAlign: TextAlign.right,
+                      style: const TextStyle(
+                        color: Color(0xB3FFFFFF),
+                        fontSize: 12,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  TextButton(
+                    onPressed: onSignOut,
+                    style: TextButton.styleFrom(
+                      foregroundColor: FloviColors.mint,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 14,
+                        vertical: 10,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(999),
+                        side: const BorderSide(color: FloviColors.mint),
+                      ),
+                    ),
+                    child: const Text(
+                      'Sign out',
+                      style: TextStyle(fontWeight: FontWeight.w900),
+                    ),
+                  ),
+                ],
               ),
             ),
           ],
