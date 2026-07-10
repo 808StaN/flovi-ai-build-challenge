@@ -36,9 +36,14 @@ const userInitials = computed(() =>
     .join('') || 'F',
 );
 
+const dateTimeValue = (value) => {
+  const timestamp = new Date(value).getTime();
+  return Number.isNaN(timestamp) ? 0 : timestamp;
+};
+
 const sortedRequests = computed(() =>
   [...requests.value].sort((first, second) =>
-    new Date(second.created_at).getTime() - new Date(first.created_at).getTime(),
+    dateTimeValue(second.created_at) - dateTimeValue(first.created_at),
   ),
 );
 
@@ -186,8 +191,24 @@ const startEdit = (request) => {
 
 const canEdit = (request) => request.dispatcher_id === session.value?.user?.id;
 
-const formatDate = (value) => {
+const parseDate = (value, dateOnly = false) => {
   if (!value) {
+    return null;
+  }
+
+  const normalizedValue = String(value);
+  const dateValue = dateOnly && /^\d{4}-\d{2}-\d{2}$/.test(normalizedValue)
+    ? `${normalizedValue}T12:00:00`
+    : normalizedValue;
+  const date = new Date(dateValue);
+
+  return Number.isNaN(date.getTime()) ? null : date;
+};
+
+const formatDate = (value) => {
+  const date = parseDate(value, true);
+
+  if (!date) {
     return 'No date';
   }
 
@@ -195,12 +216,14 @@ const formatDate = (value) => {
     month: 'short',
     day: 'numeric',
     year: 'numeric',
-  }).format(new Date(`${value}T12:00:00`));
+  }).format(date);
 };
 
-const formatDateTime = (value) => {
-  if (!value) {
-    return 'Not booked yet';
+const formatDateTime = (value, fallback = 'Unavailable') => {
+  const date = parseDate(value);
+
+  if (!date) {
+    return fallback;
   }
 
   return new Intl.DateTimeFormat('en', {
@@ -208,7 +231,7 @@ const formatDateTime = (value) => {
     day: 'numeric',
     hour: '2-digit',
     minute: '2-digit',
-  }).format(new Date(value));
+  }).format(date);
 };
 
 const statusLabel = (status) => ({
@@ -490,7 +513,7 @@ onUnmounted(() => {
                     </div>
                     <div class="rounded-2xl bg-white px-4 py-3">
                       <dt class="font-black text-flovi-night/[0.45]">Booked</dt>
-                      <dd class="mt-1 font-bold">{{ formatDateTime(request.booked_at) }}</dd>
+                      <dd class="mt-1 font-bold">{{ formatDateTime(request.booked_at, 'Not booked yet') }}</dd>
                     </div>
                     <div class="rounded-2xl bg-white px-4 py-3">
                       <dt class="font-black text-flovi-night/[0.45]">Driver</dt>
