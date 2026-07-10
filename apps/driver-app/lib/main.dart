@@ -31,14 +31,14 @@ class DriverApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         useMaterial3: true,
-        scaffoldBackgroundColor: FloviColors.ink,
+        scaffoldBackgroundColor: FloviColors.surface,
         colorScheme: ColorScheme.fromSeed(
           seedColor: FloviColors.mint,
-          brightness: Brightness.dark,
+          brightness: Brightness.light,
         ),
         textTheme: Theme.of(context).textTheme.apply(
-              bodyColor: Colors.white,
-              displayColor: Colors.white,
+              bodyColor: FloviColors.ink,
+              displayColor: FloviColors.ink,
               fontFamily: 'Inter',
             ),
       ),
@@ -127,7 +127,8 @@ class _DriverHomePageState extends State<DriverHomePage> {
 
     if (client == null) {
       setState(() {
-        _authError = 'Add SUPABASE_URL and SUPABASE_ANON_KEY dart defines before signing in.';
+        _authError =
+            'Add SUPABASE_URL and SUPABASE_ANON_KEY dart defines before signing in.';
       });
       return;
     }
@@ -317,7 +318,8 @@ class _DriverHomePageState extends State<DriverHomePage> {
   List<RelocationRequest> _parseRequests(dynamic response) {
     final rows = response as List<dynamic>;
     return rows
-        .map((row) => RelocationRequest.fromJson(Map<String, dynamic>.from(row as Map)))
+        .map((row) =>
+            RelocationRequest.fromJson(Map<String, dynamic>.from(row as Map)))
         .toList();
   }
 
@@ -339,8 +341,10 @@ class _DriverHomePageState extends State<DriverHomePage> {
   @override
   Widget build(BuildContext context) {
     final user = _session?.user;
-    final displayName = user?.userMetadata?['full_name']?.toString() ?? user?.email ?? 'Driver';
-    final visibleGigs = _selectedTab == DriverTab.available ? _availableGigs : _bookedGigs;
+    final displayName =
+        user?.userMetadata?['full_name']?.toString() ?? user?.email ?? 'Driver';
+    final visibleGigs =
+        _selectedTab == DriverTab.available ? _availableGigs : _bookedGigs;
 
     return Scaffold(
       body: Stack(
@@ -353,36 +357,42 @@ class _DriverHomePageState extends State<DriverHomePage> {
               onRefresh: _loadGigs,
               child: SingleChildScrollView(
                 physics: const AlwaysScrollableScrollPhysics(),
-                padding: const EdgeInsets.fromLTRB(20, 18, 20, 28),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _TopBar(
-                      isSignedIn: _session != null,
-                      displayName: displayName,
-                      onSignOut: _signOut,
+                padding: const EdgeInsets.fromLTRB(16, 14, 16, 28),
+                child: Center(
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 560),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _TopBar(
+                          isSignedIn: _session != null,
+                          displayName: displayName,
+                          onSignOut: _signOut,
+                        ),
+                        const SizedBox(height: 18),
+                        if (_session == null)
+                          _SignedOutShell(
+                            authError: _authError,
+                            onSignIn: _signInWithGoogle,
+                          )
+                        else
+                          _DriverWorkspace(
+                            displayName: displayName,
+                            selectedTab: _selectedTab,
+                            isLoading: _isLoading,
+                            bookingRequestId: _bookingRequestId,
+                            workflowError: _workflowError,
+                            availableCount: _availableGigs.length,
+                            bookedCount: _bookedGigs.length,
+                            visibleGigs: visibleGigs,
+                            onSelectTab: (tab) =>
+                                setState(() => _selectedTab = tab),
+                            onRefresh: _loadGigs,
+                            onBook: _confirmBooking,
+                          ),
+                      ],
                     ),
-                    const SizedBox(height: 30),
-                    if (_session == null)
-                      _SignedOutShell(
-                        authError: _authError,
-                        onSignIn: _signInWithGoogle,
-                      )
-                    else
-                      _DriverWorkspace(
-                        displayName: displayName,
-                        selectedTab: _selectedTab,
-                        isLoading: _isLoading,
-                        bookingRequestId: _bookingRequestId,
-                        workflowError: _workflowError,
-                        availableCount: _availableGigs.length,
-                        bookedCount: _bookedGigs.length,
-                        visibleGigs: visibleGigs,
-                        onSelectTab: (tab) => setState(() => _selectedTab = tab),
-                        onRefresh: _loadGigs,
-                        onBook: _confirmBooking,
-                      ),
-                  ],
+                  ),
                 ),
               ),
             ),
@@ -469,28 +479,43 @@ class _DriverWorkspace extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _Pill(label: 'Signed in as $displayName'),
-        const SizedBox(height: 18),
-        const Text(
-          'Grab the next relocation gig.',
-          style: TextStyle(
-            fontSize: 43,
-            height: 0.98,
-            fontWeight: FontWeight.w900,
-            letterSpacing: -1.5,
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(
+            color: FloviColors.night,
+            borderRadius: BorderRadius.circular(34),
+            boxShadow: FloviShadows.card,
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _Pill(label: 'Signed in as $displayName'),
+              const SizedBox(height: 18),
+              const Text(
+                'Find and book relocation gigs.',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 42,
+                  height: 0.98,
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: -1.4,
+                ),
+              ),
+              const SizedBox(height: 14),
+              const Text(
+                'Browse open dispatcher requests, confirm the job you want, and keep your booked work in one clear driver view.',
+                style: TextStyle(
+                  color: Color(0xC7FFFFFF),
+                  fontSize: 16,
+                  height: 1.55,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
           ),
         ),
-        const SizedBox(height: 14),
-        const Text(
-          'Browse unbooked moves, confirm the one you want, and keep your booked work in one mobile-first board.',
-          style: TextStyle(
-            color: Color(0xB3FFFFFF),
-            fontSize: 16,
-            height: 1.55,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-        const SizedBox(height: 22),
+        const SizedBox(height: 16),
         _SummaryPanel(
           availableCount: availableCount,
           bookedCount: bookedCount,
@@ -544,6 +569,7 @@ class _SummaryPanel extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(32),
+        border: Border.all(color: FloviColors.ink.withAlpha(18)),
         boxShadow: const [
           BoxShadow(
             color: Color(0x3308061C),
@@ -559,7 +585,7 @@ class _SummaryPanel extends StatelessWidget {
             children: [
               const Expanded(
                 child: Text(
-                  'Gig pulse',
+                  'Driver board',
                   style: TextStyle(
                     color: FloviColors.ink,
                     fontSize: 24,
@@ -572,8 +598,10 @@ class _SummaryPanel extends StatelessWidget {
                 style: TextButton.styleFrom(
                   foregroundColor: FloviColors.ink,
                   backgroundColor: FloviColors.mint,
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(999)),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(999)),
                 ),
                 child: Text(
                   isLoading ? 'Syncing...' : 'Refresh',
@@ -626,9 +654,10 @@ class _DriverTabs extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(5),
       decoration: BoxDecoration(
-        color: Colors.white.withAlpha(20),
+        color: Colors.white,
         borderRadius: BorderRadius.circular(999),
-        border: Border.all(color: Colors.white.withAlpha(24)),
+        border: Border.all(color: FloviColors.ink.withAlpha(18)),
+        boxShadow: FloviShadows.soft,
       ),
       child: Row(
         children: [
@@ -672,7 +701,8 @@ class _TabButton extends StatelessWidget {
     return TextButton(
       onPressed: onPressed,
       style: TextButton.styleFrom(
-        foregroundColor: selected ? FloviColors.ink : Colors.white,
+        foregroundColor:
+            selected ? FloviColors.ink : FloviColors.ink.withAlpha(170),
         backgroundColor: selected ? FloviColors.mint : Colors.transparent,
         padding: const EdgeInsets.symmetric(vertical: 13),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(999)),
@@ -745,6 +775,8 @@ class _GigCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(32),
+        border: Border.all(color: FloviColors.ink.withAlpha(18)),
+        boxShadow: FloviShadows.soft,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -775,7 +807,9 @@ class _GigCard extends StatelessWidget {
           ),
           const SizedBox(height: 14),
           Text(
-            gig.notes?.isNotEmpty == true ? gig.notes! : 'No extra notes from dispatch.',
+            gig.notes?.isNotEmpty == true
+                ? gig.notes!
+                : 'No extra notes from dispatch.',
             style: const TextStyle(
               color: Color(0xA6100B2F),
               fontWeight: FontWeight.w700,
@@ -900,9 +934,10 @@ class _EmptyState extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(22),
       decoration: BoxDecoration(
-        color: Colors.white.withAlpha(22),
+        color: Colors.white,
         borderRadius: BorderRadius.circular(30),
-        border: Border.all(color: Colors.white.withAlpha(26)),
+        border: Border.all(color: FloviColors.ink.withAlpha(18)),
+        boxShadow: FloviShadows.soft,
       ),
       child: Column(
         children: [
@@ -910,6 +945,7 @@ class _EmptyState extends StatelessWidget {
             isAvailable ? 'No open gigs right now.' : 'No booked gigs yet.',
             textAlign: TextAlign.center,
             style: const TextStyle(
+              color: FloviColors.ink,
               fontSize: 22,
               fontWeight: FontWeight.w900,
             ),
@@ -921,7 +957,7 @@ class _EmptyState extends StatelessWidget {
                 : 'Book an available relocation to build your driver queue.',
             textAlign: TextAlign.center,
             style: const TextStyle(
-              color: Color(0xB3FFFFFF),
+              color: Color(0xB3100B2F),
               height: 1.45,
               fontWeight: FontWeight.w600,
             ),
@@ -945,78 +981,76 @@ class _TopBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Container(
-          width: 48,
-          height: 48,
-          decoration: BoxDecoration(
-            color: FloviColors.mint,
-            borderRadius: BorderRadius.circular(18),
-            boxShadow: const [
-              BoxShadow(
-                color: Color(0x5534F5A6),
-                blurRadius: 36,
-                offset: Offset(0, 18),
-              ),
-            ],
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      decoration: BoxDecoration(
+        color: FloviColors.night,
+        borderRadius: BorderRadius.circular(26),
+        boxShadow: FloviShadows.soft,
+      ),
+      child: Row(
+        children: [
+          const Text(
+            'Flovi',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 24,
+              fontWeight: FontWeight.w900,
+              letterSpacing: -0.6,
+            ),
           ),
-          child: const Center(
-            child: Text(
-              'F',
+          const SizedBox(width: 10),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            decoration: BoxDecoration(
+              color: Colors.white.withAlpha(24),
+              borderRadius: BorderRadius.circular(999),
+            ),
+            child: const Text(
+              'Driver',
               style: TextStyle(
-                color: FloviColors.ink,
-                fontSize: 22,
+                color: Color(0xCCFFFFFF),
+                fontSize: 12,
                 fontWeight: FontWeight.w900,
               ),
             ),
           ),
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                'FLOVI DRIVER',
-                style: TextStyle(
-                  color: FloviColors.mint,
-                  fontSize: 13,
-                  fontWeight: FontWeight.w900,
-                  letterSpacing: 2.2,
-                ),
-              ),
-              const SizedBox(height: 2),
-              Text(
-                isSignedIn ? displayName : 'Relocation gigs',
+          const Spacer(),
+          if (isSignedIn) ...[
+            Flexible(
+              child: Text(
+                displayName,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
+                textAlign: TextAlign.right,
                 style: const TextStyle(
-                  color: Color(0x99FFFFFF),
+                  color: Color(0xB3FFFFFF),
                   fontSize: 12,
-                  fontWeight: FontWeight.w600,
+                  fontWeight: FontWeight.w700,
                 ),
               ),
-            ],
-          ),
-        ),
-        if (isSignedIn)
-          TextButton(
-            onPressed: onSignOut,
-            style: TextButton.styleFrom(
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(999),
-                side: const BorderSide(color: Color(0x26FFFFFF)),
+            ),
+            const SizedBox(width: 10),
+            TextButton(
+              onPressed: onSignOut,
+              style: TextButton.styleFrom(
+                foregroundColor: FloviColors.mint,
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(999),
+                  side: const BorderSide(color: FloviColors.mint),
+                ),
+              ),
+              child: const Text(
+                'Sign out',
+                style: TextStyle(fontWeight: FontWeight.w900),
               ),
             ),
-            child: const Text(
-              'Sign out',
-              style: TextStyle(fontWeight: FontWeight.w800),
-            ),
-          ),
-      ],
+          ],
+        ],
+      ),
     );
   }
 }
@@ -1035,37 +1069,53 @@ class _SignedOutShell extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const _Pill(label: 'Mobile-first driver booking'),
-        const SizedBox(height: 20),
-        const Text(
-          'Claim relocation gigs without calling dispatch.',
-          style: TextStyle(
-            fontSize: 46,
-            height: 0.96,
-            fontWeight: FontWeight.w900,
-            letterSpacing: -1.8,
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(
+            color: FloviColors.night,
+            borderRadius: BorderRadius.circular(34),
+            boxShadow: FloviShadows.card,
           ),
-        ),
-        const SizedBox(height: 20),
-        const Text(
-          'Sign in with Google to browse available relocation work and keep your booked gigs synced with dispatch.',
-          style: TextStyle(
-            color: Color(0xB3FFFFFF),
-            fontSize: 17,
-            height: 1.55,
-            fontWeight: FontWeight.w500,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const _Pill(label: 'Mobile-first driver booking'),
+              const SizedBox(height: 20),
+              const Text(
+                'Book relocation work without calling dispatch.',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 44,
+                  height: 0.96,
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: -1.6,
+                ),
+              ),
+              const SizedBox(height: 20),
+              const Text(
+                'Sign in to see available dispatcher requests, book one safely, and track your confirmed work from the driver app.',
+                style: TextStyle(
+                  color: Color(0xC7FFFFFF),
+                  fontSize: 16,
+                  height: 1.55,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              const SizedBox(height: 26),
+              _PrimaryButton(
+                label: 'Continue with Google',
+                onPressed: onSignIn,
+              ),
+            ],
           ),
-        ),
-        const SizedBox(height: 28),
-        _PrimaryButton(
-          label: 'Continue with Google',
-          onPressed: onSignIn,
         ),
         if (!isSupabaseConfigured) ...[
           const SizedBox(height: 14),
           const _NoticeCard(
             color: FloviColors.lemon,
-            text: 'Supabase dart defines are missing. Pass SUPABASE_URL and SUPABASE_ANON_KEY when running or building Flutter Web.',
+            text:
+                'Supabase dart defines are missing. Pass SUPABASE_URL and SUPABASE_ANON_KEY when running or building Flutter Web.',
           ),
         ],
         if (authError != null) ...[
@@ -1075,7 +1125,7 @@ class _SignedOutShell extends StatelessWidget {
             text: authError!,
           ),
         ],
-        const SizedBox(height: 28),
+        const SizedBox(height: 16),
         const _PreviewCard(),
       ],
     );
@@ -1271,7 +1321,8 @@ class _PrimaryButton extends StatelessWidget {
           foregroundColor: FloviColors.ink,
           disabledForegroundColor: FloviColors.ink.withAlpha(150),
           padding: const EdgeInsets.symmetric(vertical: 18),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(999)),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(999)),
         ),
         child: Text(
           label,
@@ -1379,20 +1430,33 @@ class _BackgroundGlow extends StatelessWidget {
   Widget build(BuildContext context) {
     return const Stack(
       children: [
-        Positioned(
-          top: -130,
-          left: -120,
-          child: _GlowOrb(size: 320, color: Color(0x556246EA)),
+        DecoratedBox(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                Color(0xFFF7F6FF),
+                Colors.white,
+              ],
+            ),
+          ),
+          child: SizedBox.expand(),
         ),
         Positioned(
-          top: 90,
-          right: -150,
-          child: _GlowOrb(size: 360, color: Color(0x4434F5A6)),
+          top: -180,
+          right: -170,
+          child: _GlowOrb(size: 360, color: Color(0x226246EA)),
+        ),
+        Positioned(
+          top: 240,
+          left: -170,
+          child: _GlowOrb(size: 300, color: Color(0x229BD8FF)),
         ),
         Positioned(
           bottom: -180,
-          left: 40,
-          child: _GlowOrb(size: 340, color: Color(0x229BD8FF)),
+          right: -120,
+          child: _GlowOrb(size: 320, color: Color(0x22C7B8FF)),
         ),
       ],
     );
@@ -1431,8 +1495,29 @@ class FloviColors {
   static const sky = Color(0xFF9BD8FF);
   static const lemon = Color(0xFFFFE985);
   static const lilac = Color(0xFFC7B8FF);
+  static const surface = Color(0xFFF7F6FF);
 
   const FloviColors._();
+}
+
+class FloviShadows {
+  static const card = [
+    BoxShadow(
+      color: Color(0x2B08061C),
+      blurRadius: 52,
+      offset: Offset(0, 24),
+    ),
+  ];
+
+  static const soft = [
+    BoxShadow(
+      color: Color(0x1608061C),
+      blurRadius: 30,
+      offset: Offset(0, 14),
+    ),
+  ];
+
+  const FloviShadows._();
 }
 
 const _requestColumns =

@@ -5,7 +5,8 @@ void main() {
   testWidgets('renders driver auth shell', (tester) async {
     await tester.pumpWidget(const DriverApp());
 
-    expect(find.text('FLOVI DRIVER'), findsOneWidget);
+    expect(find.text('Flovi'), findsOneWidget);
+    expect(find.text('Driver'), findsOneWidget);
     expect(find.text('Continue with Google'), findsOneWidget);
   });
 }
